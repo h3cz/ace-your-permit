@@ -384,7 +384,7 @@ export default function NewYorkTeenPermit16Page() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-blue-600 text-lg px-8 min-h-[44px]"
+                className="border-white bg-transparent text-white hover:bg-white/10 hover:text-white text-lg px-8 min-h-[44px]"
               >
                 Practice Without Signing Up
               </Button>

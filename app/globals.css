@@ -238,7 +238,11 @@
    ============================================ */
 
 .force-light-theme,
-.force-light-theme * {
+.force-light-theme *,
+.force-light,
+.force-light *,
+[data-theme="light"],
+[data-theme="light"] * {
   --foreground: #1E293B;
   --muted-foreground: #6B7280;
   --card: #ffffff;

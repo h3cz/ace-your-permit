@@ -22,17 +22,24 @@ interface StepCompleteProps {
   onComplete: (data?: Partial<OnboardingData>) => void;
 }
 
+const confettiPieces = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  color: ['#3B82F6', '#F97316', '#10B981', '#F59E0B', '#EF4444'][i % 5],
+  left: `${(i * 37) % 100}%`,
+  x: ((i * 53) % 200) - 100,
+  rotate: (i * 71) % 360,
+  duration: 2 + (i % 4) * 0.35,
+  delay: (i % 5) * 0.08,
+}));
+
 export function StepComplete({ data, onComplete }: StepCompleteProps) {
   const shouldReduceMotion = useReducedMotion();
-  const [showConfetti, setShowConfetti] = useState(false);
   // window is not available during SSR — default to a sensible viewport height
   // and populate the real value on mount. Used by confetti fall animation.
   const [viewportHeight, setViewportHeight] = useState<number>(800);
 
   useEffect(() => {
-    // Trigger confetti animation
-    setShowConfetti(true);
-    setViewportHeight(window.innerHeight);
+    queueMicrotask(() => setViewportHeight(window.innerHeight));
 
     // Complete the step automatically
     const timer = setTimeout(() => {
@@ -43,36 +50,39 @@ export function StepComplete({ data, onComplete }: StepCompleteProps) {
   }, [onComplete]);
 
   const xpEarned = 150; // Total onboarding XP
-  const assessmentScore = data.assessmentScore || 0;
+  const assessmentScore =
+    typeof data.assessmentScore === "number"
+      ? data.assessmentScore
+      : typeof data.assessment === "object" && data.assessment && "score" in data.assessment
+        ? Number(data.assessment.score) || 0
+        : 0;
 
   return (
     <div className="space-y-8 text-center">
       {/* Confetti effect placeholder */}
-      {showConfetti && (
-        <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          {[...Array(20)].map((_, i) => (
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          {confettiPieces.map((piece) => (
             <motion.div
-              key={i}
+              key={piece.id}
               className="absolute w-3 h-3 rounded-full"
               style={{
-                background: ['#3B82F6', '#F97316', '#10B981', '#F59E0B', '#EF4444'][i % 5],
-                left: `${Math.random() * 100}%`,
+                background: piece.color,
+                left: piece.left,
                 top: -20,
               }}
               animate={{
                 y: viewportHeight + 40,
-                x: (Math.random() - 0.5) * 200,
-                rotate: Math.random() * 360,
+                x: piece.x,
+                rotate: piece.rotate,
               }}
               transition={shouldReduceMotion ? { duration: 0 } : {
-                duration: 2 + Math.random() * 2,
-                delay: Math.random() * 0.5,
+                duration: piece.duration,
+                delay: piece.delay,
                 ease: "easeOut",
               }}
             />
           ))}
-        </div>
-      )}
+      </div>
 
       {/* Mascot */}
       <motion.div
@@ -84,11 +94,7 @@ export function StepComplete({ data, onComplete }: StepCompleteProps) {
         <Dash
           emotion="excited"
           size="xl"
-          animate={true}
-          showSpeechBubble={true}
-          speechTitle="You Did It! 🎊"
-          speechText="Congratulations! You've completed onboarding and earned your first achievement. Let's start your driving journey!"
-          speechPosition="bottom"
+          animate={!shouldReduceMotion}
         />
       </motion.div>
 
@@ -111,7 +117,7 @@ export function StepComplete({ data, onComplete }: StepCompleteProps) {
         transition={shouldReduceMotion ? { duration: 0 } : { delay: 0.3 }}
       >
         <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
-          You're All Set!
+          You&apos;re All Set!
         </h1>
         <p className="text-lg text-muted-foreground mt-2">
           Welcome to Ace Your Permit, Driver!
@@ -173,7 +179,7 @@ export function StepComplete({ data, onComplete }: StepCompleteProps) {
         transition={shouldReduceMotion ? { duration: 0 } : { delay: 0.5 }}
         className="bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl p-6 max-w-lg mx-auto"
       >
-        <h3 className="font-semibold text-foreground mb-3">What's Next?</h3>
+        <h3 className="font-semibold text-foreground mb-3">What&apos;s Next?</h3>
         <ul className="space-y-2 text-left">
           <li className="flex items-center gap-2 text-sm text-muted-foreground">
             <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center shrink-0">
@@ -212,7 +218,7 @@ export function StepComplete({ data, onComplete }: StepCompleteProps) {
           </Button>
         </Link>
         <p className="text-sm text-muted-foreground mt-3">
-          You'll be redirected automatically in a few seconds...
+          You&apos;ll be redirected automatically in a few seconds...
         </p>
       </motion.div>
     </div>

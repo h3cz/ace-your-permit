@@ -93,17 +93,15 @@ export function StepTutorial({ updateData, onComplete }: StepTutorialProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header with mascot */}
-      <div className="flex items-center gap-4 mb-6">
-        <Dash
-          emotion="happy"
-          size="md"
-          animate={true}
-          showSpeechBubble={true}
-          speechTitle="App Tutorial"
-          speechText="Let me show you around! This will just take a minute."
-          speechPosition="right"
-        />
+      <div className="flex items-center gap-4 rounded-2xl border border-blue-100 bg-white p-4 shadow-sm">
+        <Dash emotion="happy" size="md" animate={!shouldReduceMotion} />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-blue-600">App tour</p>
+          <h2 className="text-xl font-bold text-slate-950">Know where to tap</h2>
+          <p className="text-sm text-slate-600">
+            A quick sweep of the main tools before you start practicing.
+          </p>
+        </div>
       </div>
 
       {/* Progress dots */}

@@ -15,7 +15,7 @@ interface StepAssessmentProps {
   onComplete: (data?: Partial<OnboardingData>) => void;
 }
 
-export function StepAssessment({ data, updateData, onComplete }: StepAssessmentProps) {
+export function StepAssessment({ updateData, onComplete }: StepAssessmentProps) {
   const shouldReduceMotion = useReducedMotion();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -51,6 +51,7 @@ export function StepAssessment({ data, updateData, onComplete }: StepAssessmentP
     const score = Math.round((correctCount / ASSESSMENT_QUESTIONS.length) * 100);
 
     updateData({
+      assessmentScore: score,
       assessment: {
         score,
         answers,
@@ -58,6 +59,7 @@ export function StepAssessment({ data, updateData, onComplete }: StepAssessmentP
     });
 
     onComplete({
+      assessmentScore: score,
       assessment: {
         score,
         answers,
@@ -80,15 +82,7 @@ export function StepAssessment({ data, updateData, onComplete }: StepAssessmentP
         <Dash
           emotion={score >= 60 ? "excited" : "encouraging"}
           size="lg"
-          animate={true}
-          showSpeechBubble={true}
-          speechTitle={score >= 60 ? "Great Job! 🎉" : "Good Effort! 💪"}
-          speechText={
-            score >= 60
-              ? `You scored ${score}%! You're off to a great start. Let's keep learning!`
-              : `You scored ${score}%. Don't worry - that's why we're here to help you improve!`
-          }
-          speechPosition="bottom"
+          animate={!shouldReduceMotion}
         />
 
         <div className="space-y-2">

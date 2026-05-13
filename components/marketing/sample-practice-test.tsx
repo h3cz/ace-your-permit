@@ -64,7 +64,7 @@ export function SamplePracticeTest({ questions }: SamplePracticeTestProps) {
           onSelect={(selectedIndex) =>
             setAnswers((current) => ({
               ...current,
-              [question.id]: selectedIndex,
+              [question.id]: current[question.id] ?? selectedIndex,
             }))
           }
         />
@@ -147,6 +147,7 @@ function SampleQuestionCard({
                       : "border-slate-200 bg-slate-50 text-slate-700 hover:border-blue-300 hover:bg-blue-50"
               }`}
               onClick={() => onSelect(optionIndex)}
+              disabled={hasAnswered}
               aria-pressed={isSelected}
             >
               {showCorrect ? (

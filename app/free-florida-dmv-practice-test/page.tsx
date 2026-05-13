@@ -403,7 +403,7 @@ export default function FreeFloridaDMVPracticeTestPage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-blue-600 text-lg px-8 min-h-[44px]"
+                className="border-white bg-transparent text-white hover:bg-white/10 hover:text-white text-lg px-8 min-h-[44px]"
               >
                 Practice Without Signing Up
               </Button>
@@ -469,7 +469,7 @@ const features: Array<{
 }> = [
   {
     title: "Dash — Your Hype-Beast Coach",
-    desc: "Dash breaks down every question with encouragement, never judgment. Wrong answer? Dash explains why without making you feel bad.",
+    desc: "Dash breaks down every question with encouragement, never judgment. Miss one? Dash explains why without making you feel bad.",
     Icon: Star,
     iconBg: "bg-orange-100",
     iconColor: "text-orange-500",

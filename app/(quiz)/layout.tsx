@@ -19,7 +19,7 @@ export default async function QuizLayout({
     <>
       <DesktopSidebar />
       <MobileNav />
-      <div className="force-light-theme md:pl-16 lg:pl-64">
+      <div className="force-light-theme min-h-screen pt-16 pb-20 md:pt-0 md:pb-0 md:pl-16 lg:pl-64">
         {children}
       </div>
     </>

@@ -357,7 +357,7 @@ export default function FreePennsylvaniaDMVPracticeTestPage() {
               </Button>
             </Link>
             <Link href="#sample-practice">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-blue-600 text-lg px-8 min-h-[44px]">
+              <Button size="lg" variant="outline" className="border-white bg-transparent text-white hover:bg-white/10 hover:text-white text-lg px-8 min-h-[44px]">
                 Practice Without Signing Up
               </Button>
             </Link>
@@ -406,7 +406,7 @@ const features: Array<{
 }> = [
   {
     title: "Dash — Your Hype-Beast Coach",
-    desc: "Dash breaks down every question with encouragement, never judgment. Wrong answer? Dash explains why. Right answer? Pure hype.",
+    desc: "Dash breaks down every question with encouragement, never judgment. Miss one? Dash explains why. Right answer? Pure hype.",
     Icon: Star,
     iconBg: "bg-orange-100",
     iconColor: "text-orange-500",
