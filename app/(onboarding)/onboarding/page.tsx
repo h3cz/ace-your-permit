@@ -70,7 +70,7 @@ function OnboardingPageInner() {
   const isFirstStep = onboarding.currentStep === 0;
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="force-light-theme min-h-screen flex flex-col lg:flex-row bg-[#F8FAFC] text-slate-900">
       {/* Mobile: Top progress bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="px-4 py-3">
