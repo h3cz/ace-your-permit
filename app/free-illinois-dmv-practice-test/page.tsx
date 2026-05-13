@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InteractivePermitAd } from "@/components/marketing/interactive-permit-ad";
+import { SamplePracticeTest } from "@/components/marketing/sample-practice-test";
 
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
@@ -217,7 +219,7 @@ export default function FreeIllinoisDMVPracticeTestPage() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Link href="/quiz">
+            <Link href="#sample-practice">
               <Button
                 size="lg"
                 variant="outline"
@@ -229,6 +231,8 @@ export default function FreeIllinoisDMVPracticeTestPage() {
           </div>
         </div>
       </section>
+
+      <InteractivePermitAd />
 
       {/* ── Free Proof Bar ── */}
       <section className="py-10 px-4 sm:px-6 lg:px-8 bg-white border-y border-gray-100">
@@ -261,15 +265,11 @@ export default function FreeIllinoisDMVPracticeTestPage() {
               Try 3 Real Questions Right Now
             </h2>
             <p className="text-gray-600">
-              No account needed. Click the correct answer — Dash will explain it.
+              No account needed. Pick an answer and Dash will explain it.
             </p>
           </div>
 
-          <div className="space-y-8">
-            {sampleQuestions.map((q, idx) => (
-              <SampleQuestion key={q.id} index={idx + 1} question={q} />
-            ))}
-          </div>
+          <SamplePracticeTest questions={sampleQuestions} />
 
           <div className="mt-10 text-center">
             <p className="text-gray-600 mb-4">
@@ -429,7 +429,7 @@ export default function FreeIllinoisDMVPracticeTestPage() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Link href="/quiz">
+            <Link href="#sample-practice">
               <Button
                 size="lg"
                 variant="outline"
@@ -475,74 +475,6 @@ export default function FreeIllinoisDMVPracticeTestPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppJsonLd) }}
       />
-    </div>
-  );
-}
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-interface SampleQuestionProps {
-  index: number;
-  question: {
-    id: string;
-    question: string;
-    options: string[];
-    correctIndex: number;
-    explanation: string;
-    source: string;
-  };
-}
-
-function SampleQuestion({ index, question }: SampleQuestionProps) {
-  return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6">
-      <p className="text-xs font-semibold text-blue-600 uppercase tracking-widest mb-3">
-        Question {index} of 3
-      </p>
-      <p className="text-base font-semibold text-gray-900 mb-5">
-        {question.question}
-      </p>
-      <div className="space-y-3 mb-5">
-        {question.options.map((opt, i) => {
-          const isCorrect = i === question.correctIndex;
-          return (
-            <div
-              key={opt}
-              className={`flex items-center gap-3 rounded-xl border px-4 py-3 min-h-[44px] ${
-                isCorrect
-                  ? "border-green-400 bg-green-50"
-                  : "border-gray-200 bg-gray-50"
-              }`}
-            >
-              {isCorrect ? (
-                <CheckCircle2 className="w-5 h-5 text-green-500 shrink-0" />
-              ) : (
-                <div className="w-5 h-5 rounded-full border-2 border-gray-300 shrink-0" />
-              )}
-              <span
-                className={`text-sm ${
-                  isCorrect
-                    ? "text-green-800 font-semibold"
-                    : "text-gray-700"
-                }`}
-              >
-                {opt}
-              </span>
-              {isCorrect && (
-                <span className="ml-auto text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
-                  Correct
-                </span>
-              )}
-            </div>
-          );
-        })}
-      </div>
-      <div className="rounded-lg bg-blue-50 border border-blue-100 px-4 py-3">
-        <p className="text-sm text-blue-900">
-          <strong>Dash says:</strong> {question.explanation}
-        </p>
-        <p className="text-xs text-blue-500 mt-1">{question.source}</p>
-      </div>
     </div>
   );
 }

@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SamplePracticeTest } from "@/components/marketing/sample-practice-test";
 
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
@@ -130,6 +131,44 @@ const nyFacts = [
   { label: "No credit card", sub: "ever required" },
 ];
 
+const sampleQuestions = [
+  {
+    id: "ny-sample-001",
+    question:
+      "How many questions do you need to answer correctly to pass the New York DMV permit test?",
+    options: ["14 out of 20", "15 out of 20", "16 out of 20", "18 out of 20"],
+    correctIndex: 0,
+    explanation:
+      "The New York DMV written test has 20 questions, and you need at least 14 correct to pass.",
+    source: "New York MV-21 Driver's Manual — Permit Test",
+  },
+  {
+    id: "ny-sample-002",
+    question:
+      "What should you do at a flashing red traffic light?",
+    options: [
+      "Stop completely, then go when it is safe",
+      "Slow down and keep moving",
+      "Yield only if another vehicle is close",
+      "Treat it like a green light",
+    ],
+    correctIndex: 0,
+    explanation:
+      "A flashing red light means the same thing as a stop sign. Stop fully, then continue when the way is clear.",
+    source: "New York MV-21 Driver's Manual — Traffic Control Signals",
+  },
+  {
+    id: "ny-sample-003",
+    question:
+      "In New York, what is the legal blood alcohol concentration limit for drivers age 21 or older?",
+    options: ["0.08%", "0.02%", "0.05%", "0.10%"],
+    correctIndex: 0,
+    explanation:
+      "For drivers age 21 and older, a BAC of 0.08% or higher is legally intoxicated in New York.",
+    source: "New York MV-21 Driver's Manual — Alcohol and Other Drugs",
+  },
+];
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function FreeNewYorkDMVPracticeTestPage() {
@@ -191,7 +230,7 @@ export default function FreeNewYorkDMVPracticeTestPage() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Link href="/quiz">
+            <Link href="#sample-practice">
               <Button
                 size="lg"
                 variant="outline"
@@ -218,6 +257,37 @@ export default function FreeNewYorkDMVPracticeTestPage() {
                 <span className="text-sm text-gray-500">{item.sub}</span>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Sample Questions ── */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3 font-display tracking-tight">
+              Try 3 Real Questions Right Now
+            </h2>
+            <p className="text-gray-600">
+              No account needed. Pick an answer and Dash will explain it.
+            </p>
+          </div>
+
+          <SamplePracticeTest questions={sampleQuestions} />
+
+          <div className="mt-10 text-center">
+            <p className="text-gray-600 mb-4">
+              Want the full New York practice test with streaks, XP, and Dash coaching?
+            </p>
+            <Link href="/signup">
+              <Button
+                size="lg"
+                className="bg-orange-500 hover:bg-orange-600 text-white text-lg px-8 min-h-[44px]"
+              >
+                Start Free — No Card Required
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -340,7 +410,7 @@ export default function FreeNewYorkDMVPracticeTestPage() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Link href="/quiz">
+            <Link href="#sample-practice">
               <Button
                 size="lg"
                 variant="outline"
