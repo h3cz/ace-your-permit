@@ -133,10 +133,14 @@ export default function QuizLobbyPage() {
           </Card>
 
           <Card>
-            <CardContent className="grid h-full grid-cols-3 gap-3 p-4 lg:grid-cols-1">
-              <MiniStat value="12" label="Quizzes" />
-              <MiniStat value="5" label="Day streak" />
-              <MiniStat value="78%" label="Accuracy" />
+            <CardContent className="flex h-full flex-col justify-center gap-3 p-5">
+              <p className="text-sm font-semibold text-blue-600">No fake stats here</p>
+              <h2 className="font-display text-2xl font-bold text-foreground">
+                Practice updates your real dashboard.
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Finish a quiz to start tracking XP, streaks, and accuracy.
+              </p>
             </CardContent>
           </Card>
         </header>
@@ -260,15 +264,6 @@ function ModeCard({
         </CardContent>
       </Card>
     </Link>
-  );
-}
-
-function MiniStat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="rounded-xl bg-muted px-3 py-3 text-center">
-      <p className="font-mono text-lg font-bold text-foreground">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
-    </div>
   );
 }
 

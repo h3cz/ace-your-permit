@@ -474,7 +474,7 @@ export default function Home() {
               </Button>
             </Link>
             <Link href="/login">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-blue-600 text-lg px-8">
+              <Button size="lg" variant="outline" className="border-white bg-transparent text-white hover:bg-white/10 hover:text-white text-lg px-8">
                 I Already Have an Account
               </Button>
             </Link>

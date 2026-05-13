@@ -20,28 +20,38 @@ interface StepGoalsProps {
 
 export function StepGoals({ data, updateData, onComplete }: StepGoalsProps) {
   const shouldReduceMotion = useReducedMotion();
+  const [today] = useState(() => new Date());
+  const todayTime = today.getTime();
+  const todayIso = today.toISOString().split('T')[0];
   const [formData, setFormData] = useState({
     testDate: data.testDate || "",
     dailyStudyTime: data.dailyGoal || 20,
     targetScore: 85,
   });
 
+  const labelClass = "flex items-center gap-2 text-sm font-semibold text-slate-800";
+  const labelIconClass = "w-4 h-4 text-slate-500";
+  const helperClass = "text-sm text-slate-600";
+  const choiceClass = "min-h-20 rounded-xl border-2 bg-white p-3 text-left transition-all";
+
   const handleSubmit = () => {
     updateData({
       testDate: formData.testDate || undefined,
       dailyGoal: formData.dailyStudyTime,
+      targetScore: formData.targetScore,
     });
 
     onComplete({
       testDate: formData.testDate || undefined,
       dailyGoal: formData.dailyStudyTime,
+      targetScore: formData.targetScore,
     });
   };
 
   // Calculate recommended study plan
   const getStudyPlan = () => {
     const weeksUntilTest = formData.testDate 
-      ? Math.ceil((new Date(formData.testDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 7))
+      ? Math.ceil((new Date(formData.testDate).getTime() - todayTime) / (1000 * 60 * 60 * 24 * 7))
       : null;
     
     if (weeksUntilTest && weeksUntilTest > 0) {
@@ -54,17 +64,15 @@ export function StepGoals({ data, updateData, onComplete }: StepGoalsProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header with mascot */}
-      <div className="flex items-center gap-4 mb-6">
-        <Dash
-          emotion="thinking"
-          size="md"
-          animate={true}
-          showSpeechBubble={true}
-          speechTitle="Set Your Goals!"
-          speechText="Setting clear goals helps you stay motivated and track your progress. Let's plan your study schedule!"
-          speechPosition="right"
-        />
+      <div className="flex items-center gap-4 rounded-2xl border border-blue-100 bg-white p-4 shadow-sm">
+        <Dash emotion="thinking" size="md" animate={!shouldReduceMotion} />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-blue-600">Set your goals</p>
+          <h2 className="text-xl font-bold text-slate-950">Build your study rhythm</h2>
+          <p className="text-sm text-slate-600">
+            Pick a plan you can actually keep. Tiny reps still count.
+          </p>
+        </div>
       </div>
 
       <motion.div
@@ -75,8 +83,8 @@ export function StepGoals({ data, updateData, onComplete }: StepGoalsProps) {
       >
         {/* Test date */}
         <div className="space-y-2">
-          <Label htmlFor="testDate" className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-muted-foreground" />
+          <Label htmlFor="testDate" className={labelClass}>
+            <Calendar className={labelIconClass} />
             When is your test? (Optional)
           </Label>
           <input
@@ -84,18 +92,18 @@ export function StepGoals({ data, updateData, onComplete }: StepGoalsProps) {
             type="date"
             value={formData.testDate}
             onChange={(e) => setFormData({ ...formData, testDate: e.target.value })}
-            className="w-full h-10 px-3 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            min={new Date().toISOString().split('T')[0]}
+            className="h-12 w-full rounded-md border border-slate-300 bg-white px-3 text-base text-slate-950 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+            min={todayIso}
           />
-          <p className="text-xs text-muted-foreground">
-            Don't have a date yet? No problem! You can set one later.
+          <p className={helperClass}>
+            Don&apos;t have a date yet? No problem. You can set one later.
           </p>
         </div>
 
         {/* Daily study time */}
         <div className="space-y-3">
-          <Label className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-muted-foreground" />
+          <Label className={labelClass}>
+            <Clock className={labelIconClass} />
             How much time can you study daily?
           </Label>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -104,15 +112,15 @@ export function StepGoals({ data, updateData, onComplete }: StepGoalsProps) {
                 key={option.value}
                 onClick={() => setFormData({ ...formData, dailyStudyTime: option.value })}
                 className={`
-                  p-3 rounded-xl border-2 text-left transition-all
+                  ${choiceClass}
                   ${formData.dailyStudyTime === option.value
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-blue-500 bg-blue-50 shadow-sm"
+                    : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                   }
                 `}
               >
-                <div className="font-medium text-foreground">{option.label}</div>
-                <div className="text-xs text-muted-foreground">{option.description}</div>
+                <div className="font-semibold text-slate-950">{option.label}</div>
+                <div className="text-sm text-slate-600">{option.description}</div>
               </button>
             ))}
           </div>
@@ -120,9 +128,9 @@ export function StepGoals({ data, updateData, onComplete }: StepGoalsProps) {
 
         {/* Target score */}
         <div className="space-y-3">
-          <Label className="flex items-center gap-2">
-            <Target className="w-4 h-4 text-muted-foreground" />
-            What's your target score?
+          <Label className={labelClass}>
+            <Target className={labelIconClass} />
+            What&apos;s your target score?
           </Label>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {TARGET_SCORE_OPTIONS.map((option) => (
@@ -130,15 +138,15 @@ export function StepGoals({ data, updateData, onComplete }: StepGoalsProps) {
                 key={option.value}
                 onClick={() => setFormData({ ...formData, targetScore: option.value })}
                 className={`
-                  p-3 rounded-xl border-2 text-left transition-all
+                  ${choiceClass}
                   ${formData.targetScore === option.value
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-blue-500 bg-blue-50 shadow-sm"
+                    : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                   }
                 `}
               >
-                <div className="font-medium text-foreground">{option.label}</div>
-                <div className="text-xs text-muted-foreground">{option.description}</div>
+                <div className="font-semibold text-slate-950">{option.label}</div>
+                <div className="text-sm text-slate-600">{option.description}</div>
               </button>
             ))}
           </div>
@@ -152,7 +160,7 @@ export function StepGoals({ data, updateData, onComplete }: StepGoalsProps) {
           transition={shouldReduceMotion ? { duration: 0 } : undefined}
           className="p-4 bg-gradient-to-r from-blue-50 to-orange-50 rounded-xl border border-blue-100"
         >
-          <p className="text-sm text-blue-800 font-medium">📚 Your Study Plan</p>
+          <p className="text-sm text-blue-800 font-medium">Your Study Plan</p>
           <p className="text-sm text-blue-600 mt-1">{getStudyPlan()}</p>
         </motion.div>
 

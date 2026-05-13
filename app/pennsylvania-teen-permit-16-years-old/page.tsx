@@ -503,7 +503,7 @@ export default function PennsylvaniaTeenPermit16Page() {
               </Button>
             </Link>
             <Link href="/">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-blue-600 text-lg px-8 h-12">
+              <Button size="lg" variant="outline" className="border-white bg-transparent text-white hover:bg-white/10 hover:text-white text-lg px-8 h-12">
                 Learn More About Ace Your Permit
               </Button>
             </Link>

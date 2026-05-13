@@ -59,7 +59,7 @@ export function DesktopSidebar({
   useEffect(() => {
     const saved = localStorage.getItem("sidebar-collapsed");
     if (saved !== null) {
-      setCollapsed(saved === "true");
+      queueMicrotask(() => setCollapsed(saved === "true"));
     }
   }, []);
 
@@ -75,8 +75,16 @@ export function DesktopSidebar({
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle shortcuts with Alt/Cmd key
-      if (!(e.altKey || e.metaKey)) return;
+      const target = e.target as HTMLElement | null;
+      const isEditable =
+        target?.isContentEditable ||
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.tagName === "SELECT";
+
+      if (isEditable) return;
+      // Use Alt-only shortcuts so browser/system Cmd shortcuts keep working.
+      if (!e.altKey || e.ctrlKey || e.metaKey) return;
 
       switch (e.key.toLowerCase()) {
         case "b":
@@ -185,7 +193,7 @@ export function DesktopSidebar({
                   )}
                   {!collapsed && (
                     <kbd className="ml-auto text-xs bg-muted px-1.5 py-0.5 rounded hidden lg:inline-block">
-                      ⌘{item.shortcut}
+                      Alt+{item.shortcut}
                     </kbd>
                   )}
                 </Link>
@@ -199,7 +207,7 @@ export function DesktopSidebar({
                   <TooltipContent side="right" className="flex items-center gap-2">
                     {item.label}
                     <kbd className="text-xs bg-muted px-1.5 py-0.5 rounded">
-                      ⌘{item.shortcut}
+                      Alt+{item.shortcut}
                     </kbd>
                   </TooltipContent>
                 </Tooltip>
@@ -258,7 +266,7 @@ export function DesktopSidebar({
                 <ChevronLeft className="w-5 h-5" />
                 <span className="text-sm">Collapse</span>
                 <kbd className="ml-auto text-xs bg-muted px-1.5 py-0.5 rounded hidden lg:inline-block">
-                  ⌘B
+                  Alt+B
                 </kbd>
               </>
             )}
@@ -300,13 +308,13 @@ export function DesktopSidebar({
                     {item.label}
                   </span>
                   <kbd className="text-xs bg-muted px-2 py-1 rounded">
-                    ⌘{item.shortcut}
+                    Alt+{item.shortcut}
                   </kbd>
                 </div>
               ))}
               <div className="flex items-center justify-between py-2 border-b">
                 <span>Toggle Sidebar</span>
-                <kbd className="text-xs bg-muted px-2 py-1 rounded">⌘B</kbd>
+                <kbd className="text-xs bg-muted px-2 py-1 rounded">Alt+B</kbd>
               </div>
             </div>
           </div>

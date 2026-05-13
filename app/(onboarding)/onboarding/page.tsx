@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { OnboardingChecklist } from "@/components/onboarding/checklist";
 import { ONBOARDING_STEPS } from "@/lib/constants/onboarding";
-import { ChevronRight, ChevronLeft, SkipForward, Sparkles } from "lucide-react";
+import { ChevronLeft, SkipForward, Sparkles } from "lucide-react";
 
 // Step components
 import { StepWelcome } from "./step-welcome";
@@ -156,7 +156,7 @@ function OnboardingPageInner() {
         {/* Main content area */}
         <div className="flex-1 overflow-hidden">
           {/* Step content */}
-          <div className="flex-1 overflow-auto p-4 lg:p-8">
+          <div className="flex-1 overflow-auto p-4 pb-28 lg:p-8">
             <div className="max-w-2xl mx-auto">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -179,7 +179,7 @@ function OnboardingPageInner() {
           </div>
         </div>
 
-        {/* Mobile: Bottom navigation */}
+        {/* Mobile: Back/skip controls. Each step owns its Continue action. */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 safe-area-inset-bottom">
           <div className="flex items-center justify-between gap-4">
             <Button
@@ -204,20 +204,7 @@ function OnboardingPageInner() {
               </Button>
             ) : null}
 
-            <Button
-              size="sm"
-              onClick={() => {
-                if (isLastStep) {
-                  onboarding.completeStep();
-                } else {
-                  onboarding.goToNextStep();
-                }
-              }}
-              className="flex-1 bg-gradient-to-r from-blue-500 to-orange-500 hover:from-blue-600 hover:to-orange-600"
-            >
-              {isLastStep ? "Finish" : "Next"}
-              {!isLastStep && <ChevronRight className="w-4 h-4 ml-1" />}
-            </Button>
+            <div className="flex-1" />
           </div>
         </div>
 
@@ -256,19 +243,7 @@ function OnboardingPageInner() {
             ))}
           </div>
 
-          <Button
-            onClick={() => {
-              if (isLastStep) {
-                onboarding.completeStep();
-              } else {
-                onboarding.goToNextStep();
-              }
-            }}
-            className="gap-2 bg-gradient-to-r from-blue-500 to-orange-500 hover:from-blue-600 hover:to-orange-600"
-          >
-            {isLastStep ? "Complete" : "Next"}
-            {!isLastStep && <ChevronRight className="w-4 h-4" />}
-          </Button>
+          <div className="w-[98px]" />
         </div>
       </div>
     </div>
