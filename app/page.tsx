@@ -71,6 +71,7 @@ export default function Home() {
               alt="Ace Your Permit"
               width={200}
               height={48}
+              style={{ width: "auto", height: "auto" }}
               priority
             />
           </div>
@@ -129,7 +130,7 @@ export default function Home() {
                   <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
                 </Button>
               </Link>
-              <Link href="/quiz">
+              <Link href="/free-illinois-dmv-practice-test#sample-practice">
                 <Button size="lg" variant="outline" className="h-14 border-white/40 bg-white/5 px-8 text-lg font-semibold text-white backdrop-blur-md hover:bg-white/15 hover:text-white">
                   Try a practice question
                 </Button>
@@ -490,6 +491,7 @@ export default function Home() {
               alt="Ace Your Permit"
               width={160}
               height={38}
+              style={{ width: "auto", height: "auto" }}
             />
           </div>
           <div className="flex items-center justify-center gap-4 mb-4 text-sm text-gray-500">
