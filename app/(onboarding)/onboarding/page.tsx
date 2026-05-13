@@ -1,15 +1,14 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { fireConversion } from "@/lib/analytics";
 import { useOnboarding } from "@/hooks/use-onboarding";
-import { Dash } from "@/components/mascot";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { OnboardingChecklist } from "@/components/onboarding/checklist";
-import { ONBOARDING_STEPS, ONBOARDING_MASCOT_MESSAGES } from "@/lib/constants/onboarding";
+import { ONBOARDING_STEPS } from "@/lib/constants/onboarding";
 import { ChevronRight, ChevronLeft, SkipForward, Sparkles } from "lucide-react";
 
 // Step components
@@ -29,23 +28,11 @@ const stepComponents = [
   StepComplete,
 ];
 
-interface MascotMessage {
-  title: string;
-  message: string;
-  emotion: "happy" | "excited" | "thinking" | "encouraging";
-}
-
 function OnboardingPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const onboarding = useOnboarding();
   const shouldReduceMotion = useReducedMotion();
-  const [showChecklist, setShowChecklist] = useState(false);
-  const [mascotMessage, setMascotMessage] = useState<MascotMessage>({
-    title: "Welcome! 🎉",
-    message: "Hi, I'm Dash! I'll be your guide to mastering your driving test. Let's get started!",
-    emotion: "excited",
-  });
 
   // Fire the signup conversion once when arriving from auth/callback with
   // ?new_signup=true (OAuth + email signup both redirect here). Strip the
@@ -59,19 +46,6 @@ function OnboardingPageInner() {
       router.replace("/onboarding");
     }
   }, [searchParams, router]);
-
-  // Update mascot message when step changes
-  useEffect(() => {
-    const stepId = ONBOARDING_STEPS[onboarding.currentStep]?.id;
-    if (stepId && ONBOARDING_MASCOT_MESSAGES[stepId as keyof typeof ONBOARDING_MASCOT_MESSAGES]) {
-      const msg = ONBOARDING_MASCOT_MESSAGES[stepId as keyof typeof ONBOARDING_MASCOT_MESSAGES];
-      setMascotMessage({
-        title: msg.title,
-        message: msg.message,
-        emotion: msg.emotion,
-      });
-    }
-  }, [onboarding.currentStep]);
 
   // Redirect to dashboard when complete
   useEffect(() => {
@@ -180,7 +154,7 @@ function OnboardingPageInner() {
         </div>
 
         {/* Main content area */}
-        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        <div className="flex-1 overflow-hidden">
           {/* Step content */}
           <div className="flex-1 overflow-auto p-4 lg:p-8">
             <div className="max-w-2xl mx-auto">
@@ -202,28 +176,6 @@ function OnboardingPageInner() {
                 </motion.div>
               </AnimatePresence>
             </div>
-          </div>
-
-          {/* Mascot sidebar (Desktop) */}
-          <div className="hidden xl:flex w-80 flex-col items-center justify-center p-8 border-l border-gray-100 bg-gradient-to-b from-white to-blue-50/30">
-            <motion.div
-              key={mascotMessage.title}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={shouldReduceMotion ? { duration: 0 } : undefined}
-              className="text-center"
-            >
-              <Dash
-                emotion={mascotMessage.emotion}
-                size="lg"
-                animate={true}
-                showSpeechBubble={true}
-                speechTitle={mascotMessage.title}
-                speechText={mascotMessage.message}
-                speechPosition="left"
-                className="mb-4"
-              />
-            </motion.div>
           </div>
         </div>
 
