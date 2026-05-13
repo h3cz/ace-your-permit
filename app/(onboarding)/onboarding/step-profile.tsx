@@ -20,7 +20,7 @@ interface StepProfileProps {
   onComplete: (data?: Partial<OnboardingData>) => void;
 }
 
-export function StepProfile({ data, updateData, onComplete }: StepProfileProps) {
+export function StepProfile({ onComplete }: StepProfileProps) {
   const shouldReduceMotion = useReducedMotion();
   const [formData, setFormData] = useState({
     displayName: "",
@@ -63,19 +63,24 @@ export function StepProfile({ data, updateData, onComplete }: StepProfileProps) 
     });
   };
 
+  const labelClass = "flex items-center gap-2 text-sm font-semibold text-slate-800";
+  const labelIconClass = "w-4 h-4 text-slate-500";
+  const fieldClass =
+    "h-12 border-slate-300 bg-white text-base text-slate-950 placeholder:text-slate-500 shadow-sm focus-visible:border-blue-500 focus-visible:ring-blue-500/30";
+  const helperClass = "text-sm text-slate-600";
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-7 text-slate-900">
       {/* Header with mascot */}
-      <div className="flex items-center gap-4 mb-6">
-        <Dash
-          emotion="happy"
-          size="md"
-          animate={true}
-          showSpeechBubble={true}
-          speechTitle="Tell Me About You!"
-          speechText="I'd love to know more about you so I can create the perfect study plan!"
-          speechPosition="right"
-        />
+      <div className="flex items-center gap-4 rounded-2xl border border-blue-100 bg-white p-4 shadow-sm">
+        <Dash emotion="happy" size="md" animate={true} />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-blue-600">Tell me about you</p>
+          <h2 className="text-xl font-bold text-slate-950">Your Profile</h2>
+          <p className="text-sm text-slate-600">
+            I&apos;ll tune your practice plan around your age, state, and goal.
+          </p>
+        </div>
       </div>
 
       <motion.div
@@ -86,8 +91,8 @@ export function StepProfile({ data, updateData, onComplete }: StepProfileProps) 
       >
         {/* Name input */}
         <div className="space-y-2">
-          <Label htmlFor="displayName" className="flex items-center gap-2">
-            <User className="w-4 h-4 text-muted-foreground" />
+          <Label htmlFor="displayName" className={labelClass}>
+            <User className={labelIconClass} />
             What should we call you?
           </Label>
           <Input
@@ -95,7 +100,7 @@ export function StepProfile({ data, updateData, onComplete }: StepProfileProps) 
             placeholder="Enter your name"
             value={formData.displayName}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, displayName: e.target.value })}
-            className={errors.displayName ? "border-red-500" : ""}
+            className={`${fieldClass} ${errors.displayName ? "border-red-500 focus-visible:ring-red-500/30" : ""}`}
           />
           {errors.displayName && (
             <p className="text-sm text-red-500">{errors.displayName}</p>
@@ -104,8 +109,8 @@ export function StepProfile({ data, updateData, onComplete }: StepProfileProps) 
 
         {/* Age input */}
         <div className="space-y-2">
-          <Label htmlFor="age" className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-muted-foreground" />
+          <Label htmlFor="age" className={labelClass}>
+            <Calendar className={labelIconClass} />
             How old are you?
           </Label>
           <Input
@@ -114,29 +119,29 @@ export function StepProfile({ data, updateData, onComplete }: StepProfileProps) 
             placeholder="Enter your age"
             value={formData.age}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, age: e.target.value })}
-            className={errors.age ? "border-red-500" : ""}
+            className={`${fieldClass} ${errors.age ? "border-red-500 focus-visible:ring-red-500/30" : ""}`}
             min={15}
             max={100}
           />
           {errors.age && (
             <p className="text-sm text-red-500">{errors.age}</p>
           )}
-          <p className="text-xs text-muted-foreground">
-            You must be at least 15 years old to apply for a learner's permit in Illinois
+          <p className={helperClass}>
+            You must be at least 15 years old to apply for a learner&apos;s permit in Illinois
           </p>
         </div>
 
         {/* State selection */}
         <div className="space-y-2">
-          <Label htmlFor="state" className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-muted-foreground" />
+          <Label htmlFor="state" className={labelClass}>
+            <MapPin className={labelIconClass} />
             Which state are you in?
           </Label>
           <select
             id="state"
             value={formData.state}
             onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-            className="w-full h-10 px-3 rounded-md border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="h-12 w-full rounded-md border border-slate-300 bg-white px-3 text-base text-slate-950 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
           >
             {US_STATES.map((state) => (
               <option key={state.value} value={state.value}>
@@ -144,15 +149,15 @@ export function StepProfile({ data, updateData, onComplete }: StepProfileProps) 
               </option>
             ))}
           </select>
-          <p className="text-xs text-muted-foreground">
+          <p className={helperClass}>
             Currently optimized for Illinois DMV tests. More states coming soon!
           </p>
         </div>
 
         {/* License type selection */}
         <div className="space-y-3">
-          <Label className="flex items-center gap-2">
-            <Car className="w-4 h-4 text-muted-foreground" />
+          <Label className={labelClass}>
+            <Car className={labelIconClass} />
             What are you studying for?
           </Label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -161,15 +166,15 @@ export function StepProfile({ data, updateData, onComplete }: StepProfileProps) 
                 key={type.value}
                 onClick={() => setFormData({ ...formData, licenseType: type.value })}
                 className={`
-                  p-4 rounded-xl border-2 text-left transition-all
+                  min-h-24 p-4 rounded-xl border-2 bg-white text-left transition-all
                   ${formData.licenseType === type.value
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-blue-500 bg-blue-50 shadow-sm"
+                    : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                   }
                 `}
               >
-                <div className="font-medium text-foreground">{type.label}</div>
-                <div className="text-xs text-muted-foreground mt-1">{type.description}</div>
+                <div className="font-semibold text-slate-950">{type.label}</div>
+                <div className="mt-1 text-sm text-slate-600">{type.description}</div>
               </button>
             ))}
           </div>
