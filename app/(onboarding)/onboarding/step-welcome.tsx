@@ -52,10 +52,6 @@ export function StepWelcome({ onComplete }: StepWelcomeProps) {
             emotion="excited"
             size="xl"
             animate={true}
-            showSpeechBubble={true}
-            speechTitle="Welcome to Ace Your Permit! 🎉"
-            speechText="I'm Dash, your personal driving test coach! Together, we'll get you ready to ace your Illinois driving test. Ready to start?"
-            speechPosition="bottom"
           />
         </motion.div>
 
@@ -65,10 +61,13 @@ export function StepWelcome({ onComplete }: StepWelcomeProps) {
           transition={shouldReduceMotion ? { duration: 0 } : { delay: 0.2 }}
         >
           <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
-            Let's Get You Road-Ready!
+            Let&apos;s Get You Road-Ready!
           </h1>
           <p className="text-lg text-muted-foreground mt-2 max-w-md mx-auto">
-            Join thousands of learners who've passed their driving test with Ace Your Permit
+            Join thousands of learners who&apos;ve passed their driving test with Ace Your Permit
+          </p>
+          <p className="text-sm text-blue-600 font-medium mt-3">
+            Dash will guide you through setup, then get out of the way.
           </p>
         </motion.div>
       </div>
@@ -114,7 +113,7 @@ export function StepWelcome({ onComplete }: StepWelcomeProps) {
           onClick={() => onComplete()}
           className="bg-gradient-to-r from-blue-500 to-orange-500 hover:from-blue-600 hover:to-orange-600 text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
         >
-          Let's Get Started!
+          Let&apos;s Get Started!
         </Button>
         <p className="text-sm text-muted-foreground mt-3">
           Takes just 2 minutes to complete your setup
