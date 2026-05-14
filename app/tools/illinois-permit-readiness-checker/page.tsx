@@ -23,8 +23,8 @@ export default function IllinoisPermitReadinessCheckerPage() {
     <main className="force-light-theme min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <section className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:px-8">
         <div>
-          <Link href="/blog" className="text-sm font-semibold text-blue-700 hover:text-blue-800">
-            Back to guides
+          <Link href="/tools" className="text-sm font-semibold text-blue-700 hover:text-blue-800">
+            Back to tools
           </Link>
           <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-orange-100 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-orange-700">
             <Gauge className="h-4 w-4" aria-hidden="true" />
