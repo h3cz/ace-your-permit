@@ -67,6 +67,9 @@ export default function BlogIndexPage() {
             <Link href="/tools/illinois-permit-readiness-checker">
               <Button variant="outline">Check If You Are Ready</Button>
             </Link>
+            <Link href="/tools">
+              <Button variant="outline">Browse Driver Tools</Button>
+            </Link>
           </div>
         </div>
 
