@@ -158,7 +158,7 @@ export function OnboardingChecklist({
           animate={{ opacity: 1, y: 0 }}
           className="mt-4 p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl text-white text-center"
         >
-          <p className="text-sm font-medium">🎉 All set! You\'re ready to ace your test!</p>
+          <p className="text-sm font-medium">🎉 All set! You&apos;re ready to ace your test!</p>
         </motion.div>
       )}
     </div>

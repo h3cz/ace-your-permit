@@ -39,17 +39,17 @@ const quizModes = [
     href: "/quiz/timed",
     badge: "Real format",
     estimatedTime: "45 min",
-    tone: "red",
+    tone: "orange",
   },
   {
     id: "mistakes",
-    name: "Review Mistakes",
-    description: "Practice what you missed before",
+    name: "Review Misses",
+    description: "Practice what needs another rep",
     icon: RotateCcw,
     href: "/quiz/mistakes",
     badge: "Personalized",
     estimatedTime: "Varies",
-    tone: "orange",
+    tone: "green",
   },
   {
     id: "marathon",
@@ -59,7 +59,7 @@ const quizModes = [
     href: "/quiz/marathon",
     badge: "All questions",
     estimatedTime: "Varies",
-    tone: "slate",
+    tone: "blue",
   },
 ];
 
@@ -269,12 +269,10 @@ function ModeCard({
 
 function modeIconClass(tone: string) {
   switch (tone) {
-    case "red":
-      return "bg-red-500 text-white";
     case "orange":
       return "bg-orange-500 text-white";
-    case "slate":
-      return "bg-slate-700 text-white";
+    case "green":
+      return "bg-emerald-500 text-white";
     default:
       return "bg-blue-600 text-white";
   }

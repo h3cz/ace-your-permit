@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+/* eslint-disable react-hooks/set-state-in-effect */
+
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 /**
@@ -35,6 +37,20 @@ interface CountdownData {
   isLoading: boolean;
 }
 
+type AttemptWithQuestion = {
+  is_correct: boolean | null;
+  question:
+    | {
+        category_id: number | null;
+        category:
+          | {
+              name: string | null;
+            }
+          | null;
+      }
+    | null;
+};
+
 // Dash messages — hype-beast tone from DESIGN.md
 function getDashMessage(state: CountdownState, days: number, readiness: number): string {
   if (state === "no_date") return "When's the big day? Set your test date and let's get to work";
@@ -60,7 +76,7 @@ function getDashEmotion(state: CountdownState, readiness: number): "happy" | "ex
 }
 
 export function useCountdown(userId?: string): CountdownData {
-  const supabase = createClient() as any;
+  const supabase = createClient();
   const [testDateStr, setTestDateStr] = useState<string | null>(null);
   const [categories, setCategories] = useState<CategoryAccuracy[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -72,6 +88,8 @@ export function useCountdown(userId?: string): CountdownData {
       return;
     }
 
+    const currentUserId = userId;
+
     async function fetchData() {
       setIsLoading(true);
 
@@ -79,7 +97,7 @@ export function useCountdown(userId?: string): CountdownData {
       const { data: profile } = await supabase
         .from("profiles")
         .select("test_date")
-        .eq("id", userId)
+        .eq("id", currentUserId)
         .maybeSingle();
 
       setTestDateStr(profile?.test_date || null);
@@ -88,7 +106,7 @@ export function useCountdown(userId?: string): CountdownData {
       const { data: attempts } = await supabase
         .from("user_attempts")
         .select("is_correct, question:questions(category_id, category:categories(name))")
-        .eq("user_id", userId)
+        .eq("user_id", currentUserId)
         .order("created_at", { ascending: false })
         .limit(200); // Fetch enough to get 20 per category
 
@@ -96,9 +114,9 @@ export function useCountdown(userId?: string): CountdownData {
         // Group by category, take last 20 per category
         const byCat: Record<number, { name: string; correct: number; total: number }> = {};
 
-        for (const attempt of attempts) {
-          const catId = (attempt.question as any)?.category_id;
-          const catName = (attempt.question as any)?.category?.name || "Unknown";
+        for (const attempt of attempts as AttemptWithQuestion[]) {
+          const catId = attempt.question?.category_id;
+          const catName = attempt.question?.category?.name || "Unknown";
           if (!catId) continue;
 
           if (!byCat[catId]) byCat[catId] = { name: catName, correct: 0, total: 0 };

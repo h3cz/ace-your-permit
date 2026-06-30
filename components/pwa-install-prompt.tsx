@@ -14,6 +14,8 @@ import {
 import { X, Download, Smartphone, Laptop } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+type Platform = "ios" | "android" | "desktop" | "other";
+
 interface PWAInstallPromptProps {
   className?: string;
   /**
@@ -44,34 +46,29 @@ export function PWAInstallPrompt({
 }: PWAInstallPromptProps) {
   const { canInstall, isStandalone, install, isInstalling } = usePWA();
   const [isVisible, setIsVisible] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
-
-  // Check if user has previously dismissed
-  useEffect(() => {
+  const [isDismissed, setIsDismissed] = useState(() => {
+    if (typeof window === "undefined") return false;
     const dismissed = localStorage.getItem("pwa-install-dismissed");
-    if (dismissed) {
-      const dismissedDate = new Date(dismissed);
-      const now = new Date();
-      const daysSinceDismissed =
-        (now.getTime() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
+    if (!dismissed) return false;
+    const dismissedDate = new Date(dismissed);
+    const daysSinceDismissed =
+      (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
+    return daysSinceDismissed < 7;
+  });
 
-      // Show again after 7 days
-      if (daysSinceDismissed < 7) {
-        setIsDismissed(true);
-      }
-    }
-  }, []);
+  const platform: Platform = getPlatform();
 
   // Show prompt after delay
   useEffect(() => {
-    if (!canInstall || isStandalone || isDismissed) return;
+    const canShowInstallCue = canInstall || platform === "ios";
+    if (!canShowInstallCue || isStandalone || isDismissed) return;
 
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [canInstall, isStandalone, isDismissed, delay]);
+  }, [canInstall, isStandalone, isDismissed, delay, platform]);
 
   const handleDismiss = () => {
     setIsVisible(false);
@@ -85,23 +82,24 @@ export function PWAInstallPrompt({
   };
 
   // Don't render if not applicable
-  if (!canInstall || isStandalone || isDismissed || !isVisible) {
+  const isIOS = platform === "ios";
+  const isAndroid = platform === "android";
+  const isDesktop = platform === "desktop";
+  const isMobile = isIOS || isAndroid;
+  const canShowInstallCue = canInstall || isIOS;
+
+  if (!canShowInstallCue || isStandalone || isDismissed || !isVisible) {
     return null;
   }
 
-  // Detect platform
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isAndroid = /Android/.test(navigator.userAgent);
-  const isMobile = isIOS || isAndroid;
-
-  if (!isMobile && !showOnDesktop) {
+  if (isDesktop && !showOnDesktop) {
     return null;
   }
 
   return (
     <div
       className={cn(
-        "fixed bottom-20 left-4 right-4 md:left-auto md:right-6 md:w-96 z-50",
+        "fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-4 right-4 z-50 md:left-auto md:right-6 md:w-96",
         "animate-in slide-in-from-bottom-4 fade-in duration-300",
         className
       )}
@@ -152,18 +150,12 @@ export function PWAInstallPrompt({
                     <line x1="12" y1="2" x2="12" y2="15" />
                   </svg>
                 </span>{" "}
-                and select "Add to Home Screen"
+                and select &quot;Add to Home Screen&quot;
               </>
             ) : isAndroid ? (
-              <>
-                Install Ace Your Permit for offline access, faster loading, and a
-                full-screen experience.
-              </>
+              <>Install Ace Your Permit for faster loading, offline fallback, and a full-screen study flow.</>
             ) : (
-              <>
-                Install Ace Your Permit on your computer for quick access and
-                offline practice.
-              </>
+              <>Install Ace Your Permit on your computer for quick access and offline fallback.</>
             )}
           </p>
         </CardContent>
@@ -182,6 +174,17 @@ export function PWAInstallPrompt({
       </Card>
     </div>
   );
+}
+
+function getPlatform(): Platform {
+  if (typeof navigator === "undefined") return "other";
+  const ua = navigator.userAgent;
+  const iOS =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (iOS) return "ios";
+  if (/Android/.test(ua)) return "android";
+  return "desktop";
 }
 
 /**

@@ -26,7 +26,7 @@ declare global {
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "";
 
-const BLOCKED_ROUTES = ["/login", "/signup", "/auth", "/privacy", "/settings"];
+const BLOCKED_ROUTES = ["/login", "/signup", "/auth", "/privacy", "/settings", "/profile", "/onboarding"];
 
 export function GoogleAnalytics() {
   const { consent } = useAnalyticsConsent();

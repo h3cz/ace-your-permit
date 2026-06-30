@@ -1,5 +1,5 @@
 /**
- * DriveMaster Service Worker (Simplified)
+ * Ace Your Permit Service Worker
  *
  * Handles:
  * - PWA install lifecycle
@@ -9,13 +9,19 @@
  * Vercel Edge Network handles asset caching in production.
  */
 
-const CACHE_NAME = "drivemaster-v2";
+const CACHE_NAME = "aceyourpermit-v3";
 const OFFLINE_URL = "/offline";
+const PRECACHE_URLS = [
+  OFFLINE_URL,
+  "/manifest.json",
+  "/icons/icon.svg",
+  "/icons/apple-touch-icon.svg",
+];
 
-// Install: cache the offline fallback page
+// Install: cache the offline fallback page and app metadata.
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.add(OFFLINE_URL))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
   );
   self.skipWaiting();
 });
@@ -34,13 +40,54 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch: network-first, offline fallback for navigation requests
-self.addEventListener("fetch", (event) => {
-  if (event.request.mode !== "navigate") return;
+function isSameOrigin(request) {
+  return new URL(request.url).origin === self.location.origin;
+}
 
-  event.respondWith(
-    fetch(event.request).catch(() => caches.match(OFFLINE_URL))
+function isCacheableAsset(url) {
+  return (
+    url.pathname === "/manifest.json" ||
+    url.pathname.startsWith("/icons/") ||
+    url.pathname.startsWith("/videos/")
   );
+}
+
+// Fetch: network-first for navigations, stale-while-revalidate for app assets.
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  if (request.method !== "GET" || !isSameOrigin(request)) return;
+
+  const url = new URL(request.url);
+  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/auth/")) {
+    return;
+  }
+
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => response)
+        .catch(() => caches.match(OFFLINE_URL))
+    );
+    return;
+  }
+
+  if (isCacheableAsset(url)) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        const networkFetch = fetch(request)
+          .then((response) => {
+            if (response.ok) {
+              const copy = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+            }
+            return response;
+          })
+          .catch(() => cached);
+
+        return cached || networkFetch;
+      })
+    );
+  }
 });
 
 // Allow client to trigger skipWaiting

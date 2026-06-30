@@ -6,6 +6,7 @@ import {
   getRateLimiter,
   rateLimitHeaders,
 } from "@/lib/ratelimit";
+import { illinoisDMVQuestions } from "@/lib/data/questions/illinois-dmv-questions";
 
 // Two-tier limit: whichever is stricter at request time wins.
 const rlExplainMinute = getRateLimiter("explain:minute", 30, 60); // 30/min
@@ -34,6 +35,9 @@ Be ultra-casual, Gen Z, friendly. Never say "incorrect" or "wrong" — say "nah"
 Use at most one emoji. No exclamation marks after bad news.
 Start by acknowledging their choice, then explain the right answer with a memorable hook.`;
 
+const hashQuestionId = (id: string): number =>
+  parseInt(id.replace(/\D/g, "").slice(0, 8), 10) || 0;
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -59,18 +63,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { questionId, selectedAnswerIndex, questionText, selectedAnswerText, correctAnswerText, staticExplanation } = await request.json();
+    const { questionId, selectedAnswerIndex } = await request.json();
 
     if (!questionId || selectedAnswerIndex === undefined) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    const numericQuestionId = Number(questionId);
+    const selectedIndex = Number(selectedAnswerIndex);
+    if (
+      !Number.isInteger(numericQuestionId) ||
+      !Number.isInteger(selectedIndex) ||
+      selectedIndex < 0 ||
+      selectedIndex > 3
+    ) {
+      return NextResponse.json({ error: "Invalid question or answer" }, { status: 400 });
+    }
+
+    const canonicalQuestion = illinoisDMVQuestions.find(
+      (question) => hashQuestionId(question.id) === numericQuestionId
+    );
+
+    if (!canonicalQuestion) {
+      return NextResponse.json({ error: "Question not found" }, { status: 404 });
+    }
+
+    if (selectedIndex === canonicalQuestion.correct_answer) {
+      return NextResponse.json({ error: "Explanation is only available for missed answers" }, { status: 400 });
+    }
+
+    const questionText = canonicalQuestion.question_text;
+    const selectedAnswerText = canonicalQuestion.options[selectedIndex];
+    const correctAnswerText = canonicalQuestion.options[canonicalQuestion.correct_answer];
+    const staticExplanation = canonicalQuestion.explanation;
+
     // Check cache first
     const { data: cached } = await supabase
       .from("ai_explanations")
       .select("explanation")
-      .eq("question_id", questionId)
-      .eq("wrong_answer_index", selectedAnswerIndex)
+      .eq("question_id", numericQuestionId)
+      .eq("wrong_answer_index", selectedIndex)
       .maybeSingle();
 
     if (cached) {
@@ -128,8 +160,8 @@ export async function POST(request: NextRequest) {
       try {
         const admin = createAdminClient();
         await admin.from("ai_explanations").upsert({
-          question_id: questionId,
-          wrong_answer_index: selectedAnswerIndex,
+          question_id: numericQuestionId,
+          wrong_answer_index: selectedIndex,
           explanation,
         }, { onConflict: "question_id,wrong_answer_index" });
       } catch (cacheErr) {

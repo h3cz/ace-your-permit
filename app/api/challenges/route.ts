@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import {
+  getIdentifier,
+  getRateLimiter,
+  rateLimitHeaders,
+} from "@/lib/ratelimit";
 import crypto from "crypto";
 
 /**
@@ -10,6 +15,8 @@ import crypto from "crypto";
  *
  * Returns: { id, shareUrl, questionCount, expiresAt }
  */
+const rlCreateChallenge = getRateLimiter("challenges:create", 10, 60 * 60);
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -17,6 +24,16 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { success, retryAfter } = await rlCreateChallenge.limit(
+      getIdentifier(request, user.id)
+    );
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Try again soon." },
+        { status: 429, headers: rateLimitHeaders(retryAfter) }
+      );
     }
 
     // Generate a random seed

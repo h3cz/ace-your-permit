@@ -756,6 +756,47 @@ export interface Database {
         }
         Relationships: []
       }
+      feature_requests: {
+        Row: {
+          id: string
+          user_id: string
+          category: string
+          title: string
+          details: string
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          category?: string
+          title: string
+          details: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          category?: string
+          title?: string
+          details?: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       friends: {
         Row: {
           id: string

@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useLeaderboard, useLeagueChanges } from "@/hooks/use-leaderboard";
+import { LeaderboardType, useLeaderboard, useLeagueChanges } from "@/hooks/use-leaderboard";
 import { useUser } from "@/hooks/use-user";
 import {
   LeaderboardTable,
@@ -49,7 +49,7 @@ export default function LeaderboardPage() {
     setShowDemotionWarningModal,
   } = useLeagueChanges();
 
-  const [activeTab, setActiveTab] = useState("league");
+  const [activeTab, setActiveTab] = useState<LeaderboardType>("league");
 
   const currentLeague = userLeague?.current_league
     ? LEAGUES[userLeague.current_league as keyof typeof LEAGUES]
@@ -104,7 +104,7 @@ export default function LeaderboardPage() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main Leaderboard */}
         <div className="lg:col-span-2">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as LeaderboardType)}>
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="league" className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" />
@@ -240,7 +240,7 @@ export default function LeaderboardPage() {
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => refreshLeaderboard(activeTab as any)}
+                onClick={() => refreshLeaderboard(activeTab)}
               >
                 <Sparkles className="w-4 h-4 mr-2" />
                 Refresh Leaderboard

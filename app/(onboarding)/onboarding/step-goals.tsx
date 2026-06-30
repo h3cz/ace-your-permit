@@ -26,7 +26,7 @@ export function StepGoals({ data, updateData, onComplete }: StepGoalsProps) {
   const [formData, setFormData] = useState({
     testDate: data.testDate || "",
     dailyStudyTime: data.dailyGoal || 20,
-    targetScore: 85,
+    targetScore: typeof data.targetScore === "number" ? data.targetScore : 85,
   });
 
   const labelClass = "flex items-center gap-2 text-sm font-semibold text-slate-800";
@@ -57,9 +57,9 @@ export function StepGoals({ data, updateData, onComplete }: StepGoalsProps) {
     if (weeksUntilTest && weeksUntilTest > 0) {
       const totalMinutes = weeksUntilTest * 7 * formData.dailyStudyTime;
       const totalHours = Math.round(totalMinutes / 60);
-      return `With ${formData.dailyStudyTime} min/day, you'll study ${totalHours} hours before your test!`;
+      return `With ${formData.dailyStudyTime} min/day, you'll study ${totalHours} hours before your test.`;
     }
-    return `Studying ${formData.dailyStudyTime} minutes daily will help you reach your goal!`;
+    return `Studying ${formData.dailyStudyTime} minutes daily will help you reach your goal.`;
   };
 
   return (

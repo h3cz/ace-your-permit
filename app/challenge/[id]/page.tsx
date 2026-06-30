@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Dash as Mascot } from "@/components/mascot";
 import { features } from "@/lib/feature-flags";
 import Link from "next/link";
-import { Trophy, Clock, ArrowRight, Copy, Check } from "lucide-react";
+import { Trophy, Clock, ArrowRight } from "lucide-react";
 
 /**
  * /challenge/[id] — Challenge quiz page
@@ -32,8 +32,10 @@ interface ChallengeData {
     expiresAt: string;
     questionCount: number;
   };
-  questions: any[];
-  results: any[];
+  questions: unknown[];
+  results: Array<{
+    score: number;
+  }>;
 }
 
 export default function ChallengePage() {
@@ -151,7 +153,7 @@ function ChallengePageInner() {
       {hasResults ? (
         <div className="space-y-4">
           <h2 className="text-center text-xl font-bold font-display">Results</h2>
-          {data.results.map((result: any, i: number) => (
+          {data.results.map((result, i) => (
             <div key={i} className="flex items-center justify-between rounded-xl border p-4">
               <div className="font-semibold">Player {i + 1}</div>
               <div className="text-2xl font-bold text-primary">{result.score}%</div>

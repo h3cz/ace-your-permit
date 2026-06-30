@@ -269,7 +269,7 @@ export function DemotionWarningModal({
             ⚠️ At Risk of Demotion
           </DialogTitle>
           <DialogDescription className="text-center">
-            You're in the demotion zone! Study more to stay in {league.name}.
+            You&apos;re in the demotion zone! Study more to stay in {league.name}.
           </DialogDescription>
         </DialogHeader>
 
@@ -304,7 +304,7 @@ export function DemotionWarningModal({
           {previousLeague && (
             <div className="p-3 bg-muted rounded-lg">
               <p className="text-sm text-muted-foreground">
-                If demoted, you'll return to{" "}
+                If demoted, you&apos;ll return to{" "}
                 <span className="font-medium" style={{ color: LEAGUE_COLORS[previousLeague] }}>
                   {LEAGUES[previousLeague].name}
                 </span>

@@ -17,6 +17,7 @@ import {
   User,
   Car,
   Settings,
+  Lightbulb,
   ChevronLeft,
   ChevronRight,
   Keyboard,
@@ -28,6 +29,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home, shortcut: "D" },
   { href: "/quiz", label: "Practice Quiz", icon: BookOpen, shortcut: "Q" },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy, shortcut: "L" },
+  { href: "/feedback", label: "Suggestions", icon: Lightbulb, shortcut: "F" },
   { href: "/profile", label: "Profile", icon: User, shortcut: "P" },
 ];
 
@@ -102,6 +104,10 @@ export function DesktopSidebar({
         case "l":
           e.preventDefault();
           window.location.href = "/leaderboard";
+          break;
+        case "f":
+          e.preventDefault();
+          window.location.href = "/feedback";
           break;
         case "p":
           e.preventDefault();

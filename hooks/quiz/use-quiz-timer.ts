@@ -33,7 +33,9 @@ export function useQuizTimer({ timeLimit, onTimeUp, isComplete }: UseQuizTimerOp
   const onTimeUpRef = useRef(onTimeUp);
 
   // Keep callback ref fresh without re-registering interval
-  onTimeUpRef.current = onTimeUp;
+  useEffect(() => {
+    onTimeUpRef.current = onTimeUp;
+  }, [onTimeUp]);
 
   useEffect(() => {
     if (!timeLimitSeconds || isComplete) return;

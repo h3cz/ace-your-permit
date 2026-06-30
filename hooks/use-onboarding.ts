@@ -3,23 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { OnboardingData, Json } from "@/types/database";
-
-// Profile type from database
-interface Profile {
-  id: string;
-  username: string;
-  display_name: string | null;
-  avatar_url: string | null;
-  state: string;
-  test_type: string;
-  test_date: string | null;
-  created_at: string;
-  updated_at: string;
-  onboarding_completed: boolean;
-  onboarding_step: number;
-  onboarding_data: Json | null;
-}
-import { ONBOARDING_STEPS, TOTAL_ONBOARDING_XP } from "@/lib/constants/onboarding";
+import { ONBOARDING_STEPS } from "@/lib/constants/onboarding";
 
 interface OnboardingState {
   currentStep: number;
@@ -170,9 +154,31 @@ export function useOnboarding(): UseOnboardingReturn {
     });
   }, []);
 
+  // Award XP to user
+  const awardXP = useCallback(async (amount: number) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      if (amount > 0) {
+        const { error } = await supabase.rpc("increment_total_xp", {
+          user_id: user.id,
+          xp_amount: amount,
+        });
+
+        if (error) {
+          console.error("Failed to increment onboarding XP:", error);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to award XP:", err);
+    }
+  }, [supabase]);
+
   // Complete current step
   const completeStep = useCallback(async (stepData?: Partial<OnboardingData>) => {
     const currentStepIndex = state.currentStep;
+    const wasAlreadyCompleted = state.completedSteps.includes(currentStepIndex);
     
     setState(prev => {
       const newCompletedSteps = [...new Set([...prev.completedSteps, currentStepIndex])];
@@ -201,9 +207,11 @@ export function useOnboarding(): UseOnboardingReturn {
       isCompleted: currentStepIndex === ONBOARDING_STEPS.length - 1 || state.isCompleted,
     });
 
-    // Award XP for completing the step
-    await awardXP(ONBOARDING_STEPS[currentStepIndex].xpReward);
-  }, [state.currentStep, state.completedSteps, state.skippedSteps, state.data, state.isCompleted, saveOnboardingState]);
+    // Award XP once per step. This keeps remounts/double taps from stacking XP.
+    if (!wasAlreadyCompleted) {
+      await awardXP(ONBOARDING_STEPS[currentStepIndex].xpReward);
+    }
+  }, [state.currentStep, state.completedSteps, state.skippedSteps, state.data, state.isCompleted, saveOnboardingState, awardXP]);
 
   // Skip current step
   const skipStep = useCallback(async () => {
@@ -257,33 +265,6 @@ export function useOnboarding(): UseOnboardingReturn {
       data: { ...prev.data, ...data },
     }));
   }, []);
-
-  // Award XP to user
-  const awardXP = useCallback(async (amount: number) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Get current stats
-      const { data: stats } = await supabase
-        .from("user_stats")
-        .select("total_xp")
-        .eq("user_id", user.id)
-        .single();
-
-      if (stats) {
-        await supabase
-          .from("user_stats")
-          .update({
-            total_xp: stats.total_xp + amount,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("user_id", user.id);
-      }
-    } catch (err) {
-      console.error("Failed to award XP:", err);
-    }
-  }, [supabase]);
 
   // Calculate progress
   const progressPercentage = Math.round(

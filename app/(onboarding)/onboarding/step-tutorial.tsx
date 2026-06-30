@@ -43,21 +43,21 @@ const tutorialSlides = [
     icon: BookOpen,
     title: "Study by Category",
     description: "Focus on specific topics like Traffic Signs, Rules of the Road, or Safe Driving. Master each area one at a time.",
-    color: "from-cyan-500 to-cyan-600",
+    color: "from-blue-500 to-blue-600",
   },
   {
     id: "goals",
     icon: Target,
     title: "Daily Goals",
-    description: "Complete daily quests to earn bonus XP and keep your streak alive. Consistent practice is the key to success!",
+    description: "Complete daily quests to earn bonus XP and keep your streak alive. Consistent practice is the key to success.",
     color: "from-orange-500 to-orange-600",
   },
   {
     id: "dash",
     icon: MessageCircle,
     title: "Meet Dash",
-    description: "I'm here to help! I'll give you tips, celebrate your wins, and encourage you when things get tough. Click me anytime!",
-    color: "from-pink-500 to-pink-600",
+    description: "I'm here to help with tips, win celebrations, and quick encouragement when a question gets spicy.",
+    color: "from-blue-500 to-orange-500",
   },
 ];
 
@@ -109,17 +109,23 @@ export function StepTutorial({ updateData, onComplete }: StepTutorialProps) {
         {tutorialSlides.map((_, index) => (
           <button
             key={index}
+            type="button"
+            aria-label={`Show tour slide ${index + 1}: ${tutorialSlides[index].title}`}
             onClick={() => setCurrentSlide(index)}
-            className={`
-              w-2.5 h-2.5 rounded-full transition-all
-              ${index === currentSlide
-                ? "bg-blue-500 w-6"
-                : completedSlides.includes(index)
-                ? "bg-blue-300"
-                : "bg-gray-200"
-              }
-            `}
-          />
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-full"
+          >
+            <span
+              className={`
+                h-2.5 rounded-full transition-all
+                ${index === currentSlide
+                  ? "w-6 bg-blue-500"
+                  : completedSlides.includes(index)
+                  ? "w-2.5 bg-blue-300"
+                  : "w-2.5 bg-gray-200"
+                }
+              `}
+            />
+          </button>
         ))}
       </div>
 

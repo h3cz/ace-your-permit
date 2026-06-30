@@ -30,7 +30,7 @@ export function useTouchDevice(): boolean {
       setIsTouchDevice(
         "ontouchstart" in window ||
           navigator.maxTouchPoints > 0 ||
-          // @ts-ignore - IE fallback
+          // @ts-expect-error - IE fallback
           (window.DocumentTouch && document instanceof window.DocumentTouch)
       );
     };

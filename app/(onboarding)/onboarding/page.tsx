@@ -68,6 +68,8 @@ function OnboardingPageInner() {
   const CurrentStepComponent = stepComponents[onboarding.currentStep];
   const isLastStep = onboarding.currentStep === ONBOARDING_STEPS.length - 1;
   const isFirstStep = onboarding.currentStep === 0;
+  const currentStepId = ONBOARDING_STEPS[onboarding.currentStep]?.id;
+  const canSkipStep = currentStepId === "assessment" || currentStepId === "tutorial";
 
   return (
     <div className="force-light-theme min-h-screen flex flex-col lg:flex-row bg-[#F8FAFC] text-slate-900">
@@ -140,14 +142,14 @@ function OnboardingPageInner() {
             </h2>
           </div>
           
-          {!isLastStep && (
+          {canSkipStep && !isLastStep && (
             <Button
               variant="ghost"
               size="sm"
               onClick={onboarding.skipStep}
               className="text-gray-500 hover:text-gray-700"
             >
-              Skip
+              Skip for now
               <SkipForward className="w-4 h-4 ml-1" />
             </Button>
           )}
@@ -193,14 +195,14 @@ function OnboardingPageInner() {
               Back
             </Button>
 
-            {!isLastStep ? (
+            {canSkipStep && !isLastStep ? (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onboarding.skipStep}
                 className="text-gray-500"
               >
-                Skip
+                Skip for now
               </Button>
             ) : null}
 
@@ -225,21 +227,28 @@ function OnboardingPageInner() {
             {ONBOARDING_STEPS.map((_, index) => (
               <button
                 key={index}
+                type="button"
+                aria-label={`Go to onboarding step ${index + 1}: ${ONBOARDING_STEPS[index].title}`}
                 onClick={() => {
                   if (index <= Math.max(...onboarding.completedSteps, onboarding.currentStep)) {
                     onboarding.goToStep(index);
                   }
                 }}
-                className={`
-                  w-2.5 h-2.5 rounded-full transition-all duration-300
-                  ${index === onboarding.currentStep
-                    ? "bg-blue-500 w-6"
-                    : onboarding.completedSteps.includes(index)
-                    ? "bg-blue-300"
-                    : "bg-gray-200"
-                  }
-                `}
-              />
+                disabled={index > Math.max(...onboarding.completedSteps, onboarding.currentStep)}
+                className="flex min-h-11 min-w-11 items-center justify-center rounded-full"
+              >
+                <span
+                  className={`
+                    h-2.5 rounded-full transition-all duration-300
+                    ${index === onboarding.currentStep
+                      ? "w-6 bg-blue-500"
+                      : onboarding.completedSteps.includes(index)
+                      ? "w-2.5 bg-blue-300"
+                      : "w-2.5 bg-gray-200"
+                    }
+                  `}
+                />
+              </button>
             ))}
           </div>
 

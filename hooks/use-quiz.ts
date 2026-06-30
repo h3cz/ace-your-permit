@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { QuestionWithAnswers, QuizSession } from "@/types/database";
-import { calculateAnswerXP, calculateXP, XPCalculationResult } from "@/lib/gamification/xp-calculator";
+import { QuestionWithAnswers } from "@/types/database";
+import { calculateXP, XPCalculationResult } from "@/lib/gamification/xp-calculator";
 import { fireConversion } from "@/lib/analytics";
+import { getCategoryName } from "@/lib/data/questions/categories";
+import { getStableAnswerId, getStableQuestionId } from "@/lib/data/questions/question-id";
 import { toast } from "sonner";
 
 export interface QuizAnswer {
@@ -74,9 +76,36 @@ interface UseQuizOptions {
   enabled?: boolean;
 }
 
+interface ApiQuestion {
+  id: string | number;
+  question_text: string;
+  options: string[];
+  correct_answer: number;
+  explanation: string | null;
+  category_id: string | null;
+  difficulty: string;
+  image_url: string | null;
+  has_image: boolean;
+  source: string | null;
+  times_asked: number;
+  correct_count: number;
+  created_at?: string;
+}
+
+function shuffleOptions(options: string[]) {
+  const shuffled = options.map((text, sourceIndex) => ({ text, sourceIndex }));
+
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  return shuffled;
+}
+
 export function useQuiz(options: UseQuizOptions) {
   const { quizType, categoryId, questionCount = 10, timeLimit, userId, enabled = true } = options;
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Generate session ID
   const sessionIdRef = useRef(`quiz_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
@@ -108,17 +137,24 @@ export function useQuiz(options: UseQuizOptions) {
   // Timer interval ref
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load questions (gated on enabled so pages can wait for auth to resolve)
-  // Fix C: AbortController prevents stale fetch responses on fast re-mounts
-  useEffect(() => {
-    if (!enabled) return;
-    const controller = new AbortController();
-    loadQuestions(controller.signal);
-    return () => controller.abort();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled]);
+  const getHydratedAnswerState = useCallback((
+    targetIndex: number,
+    answers: QuizAnswer[],
+    questions: QuestionWithAnswers[]
+  ) => {
+    const question = questions[targetIndex];
+    const existingAnswer = question
+      ? answers.find((answer) => answer.questionId === question.id)
+      : undefined;
 
-  const loadQuestions = async (signal?: AbortSignal) => {
+    return {
+      currentAnswer: existingAnswer?.selectedAnswerId ?? null,
+      isAnswered: Boolean(existingAnswer),
+      isCorrect: existingAnswer?.isCorrect ?? null,
+    };
+  }, []);
+
+  const loadQuestions = useCallback(async (signal?: AbortSignal) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -171,22 +207,26 @@ export function useQuiz(options: UseQuizOptions) {
 
       // Transform local data format (options[] + correct_answer index)
       // into the answers[] format the UI expects
-      const transformed: QuestionWithAnswers[] = json.data.map(
-        (q: { id: string; question_text: string; options: string[]; correct_answer: number; explanation: string | null; category_id: string | null; difficulty: string; image_url: string | null; has_image: boolean; source: string | null; times_asked: number; correct_count: number; created_at?: string }) => ({
+      const transformed: QuestionWithAnswers[] = (json.data as ApiQuestion[]).map((q) => {
+        const questionId = getStableQuestionId(q.id);
+        const shuffledAnswers = shuffleOptions(q.options);
+
+        return {
           ...q,
-          id: typeof q.id === "string" ? parseInt(q.id.replace(/\D/g, "").slice(0, 8)) || Math.random() * 100000 | 0 : q.id,
-          category_id: q.category_id ? parseInt(q.category_id.replace(/\D/g, "").slice(0, 8)) || null : null,
+          id: questionId,
+          category_id: q.category_id,
           question_type: "multiple_choice",
           is_active: true,
-          answers: q.options.map((text: string, idx: number) => ({
-            id: (typeof q.id === "string" ? parseInt(q.id.replace(/\D/g, "").slice(0, 8)) || 0 : q.id) * 10 + idx,
-            question_id: typeof q.id === "string" ? parseInt(q.id.replace(/\D/g, "").slice(0, 8)) || 0 : q.id,
+          created_at: q.created_at ?? new Date(0).toISOString(),
+          answers: shuffledAnswers.map(({ text, sourceIndex }, displayIndex) => ({
+            id: getStableAnswerId(questionId, sourceIndex),
+            question_id: questionId,
             answer_text: text,
-            is_correct: idx === q.correct_answer,
-            sort_order: idx,
+            is_correct: sourceIndex === q.correct_answer,
+            sort_order: displayIndex,
           })),
-        })
-      );
+        };
+      });
 
       setState((prev) => ({
         ...prev,
@@ -200,7 +240,16 @@ export function useQuiz(options: UseQuizOptions) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [categoryId, questionCount, quizType, supabase, userId]);
+
+  // Load questions (gated on enabled so pages can wait for auth to resolve)
+  // Fix C: AbortController prevents stale fetch responses on fast re-mounts
+  useEffect(() => {
+    if (!enabled) return;
+    const controller = new AbortController();
+    loadQuestions(controller.signal);
+    return () => controller.abort();
+  }, [enabled, loadQuestions]);
 
   const selectAnswer = useCallback((answerId: number) => {
     setState((prev) => {
@@ -213,6 +262,10 @@ export function useQuiz(options: UseQuizOptions) {
     if (state.currentAnswer === null || state.isAnswered) return;
 
     const currentQuestion = state.questions[state.currentQuestionIndex];
+    if (!currentQuestion || state.answers.some((answer) => answer.questionId === currentQuestion.id)) {
+      return;
+    }
+
     const correctAnswer = currentQuestion.answers.find((a) => a.is_correct);
     const isCorrect = state.currentAnswer === correctAnswer?.id;
     const timeTaken = Math.round((Date.now() - state.questionStartTime) / 1000);
@@ -229,7 +282,9 @@ export function useQuiz(options: UseQuizOptions) {
 
     setState((prev) => ({
       ...prev,
-      answers: [...prev.answers, answer],
+      answers: prev.answers.some((existing) => existing.questionId === answer.questionId)
+        ? prev.answers.map((existing) => existing.questionId === answer.questionId ? answer : existing)
+        : [...prev.answers, answer],
       isAnswered: true,
       isCorrect,
       currentStreak: newStreak,
@@ -310,30 +365,35 @@ export function useQuiz(options: UseQuizOptions) {
         return prev;
       }
 
+      const targetIndex = prev.currentQuestionIndex + 1;
+      const hydrated = getHydratedAnswerState(targetIndex, prev.answers, prev.questions);
+
       return {
         ...prev,
-        currentQuestionIndex: prev.currentQuestionIndex + 1,
-        currentAnswer: null,
-        isAnswered: false,
-        isCorrect: null,
-        questionStartTime: Date.now(),
+        currentQuestionIndex: targetIndex,
+        currentAnswer: hydrated.currentAnswer,
+        isAnswered: hydrated.isAnswered,
+        isCorrect: hydrated.isCorrect,
+        questionStartTime: hydrated.isAnswered ? prev.questionStartTime : Date.now(),
       };
     });
-  }, []);
+  }, [getHydratedAnswerState]);
 
   const previousQuestion = useCallback(() => {
     setState((prev) => {
       if (prev.currentQuestionIndex <= 0) return prev;
+      const targetIndex = prev.currentQuestionIndex - 1;
+      const hydrated = getHydratedAnswerState(targetIndex, prev.answers, prev.questions);
 
       return {
         ...prev,
-        currentQuestionIndex: prev.currentQuestionIndex - 1,
-        currentAnswer: prev.answers[prev.currentQuestionIndex - 1]?.selectedAnswerId || null,
-        isAnswered: true,
-        isCorrect: prev.answers[prev.currentQuestionIndex - 1]?.isCorrect || null,
+        currentQuestionIndex: targetIndex,
+        currentAnswer: hydrated.currentAnswer,
+        isAnswered: hydrated.isAnswered,
+        isCorrect: hydrated.isCorrect,
       };
     });
-  }, []);
+  }, [getHydratedAnswerState]);
 
   const flagQuestion = useCallback((questionIndex: number) => {
     setState((prev) => {
@@ -387,7 +447,10 @@ export function useQuiz(options: UseQuizOptions) {
         const question = state.questions[index];
         const catId = String(question.category_id ?? "unknown");
         if (!categoryStats[catId]) {
-          categoryStats[catId] = { name: "Unknown", wrongCount: 0 };
+          categoryStats[catId] = {
+            name: catId === "unknown" ? "Mixed Topics" : getCategoryName(catId),
+            wrongCount: 0,
+          };
         }
         categoryStats[catId].wrongCount++;
       }
@@ -535,7 +598,7 @@ export function useQuiz(options: UseQuizOptions) {
       results: null,
     });
     loadQuestions();
-  }, [quizType, categoryId, timeLimit]);
+  }, [quizType, categoryId, timeLimit, loadQuestions]);
 
   const currentQuestion = state.questions[state.currentQuestionIndex];
 
@@ -548,7 +611,7 @@ export function useQuiz(options: UseQuizOptions) {
 
     // Computed
     progress: state.questions.length > 0
-      ? ((state.currentQuestionIndex + (state.isAnswered ? 1 : 0)) / state.questions.length) * 100
+      ? (new Set(state.answers.map((answer) => answer.questionId)).size / state.questions.length) * 100
       : 0,
     canGoBack: state.currentQuestionIndex > 0,
     canGoForward: state.currentQuestionIndex < state.questions.length - 1 && state.isAnswered,

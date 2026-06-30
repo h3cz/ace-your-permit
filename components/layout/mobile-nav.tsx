@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Home, BookOpen, Trophy, User, Car, Menu, X, Settings } from "lucide-react";
+import { Home, BookOpen, Trophy, User, Car, Menu, Settings, Lightbulb } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
@@ -13,6 +13,11 @@ const navItems = [
   { href: "/quiz", label: "Quiz", icon: BookOpen, shortcut: "2" },
   { href: "/leaderboard", label: "Rank", icon: Trophy, shortcut: "3" },
   { href: "/profile", label: "Profile", icon: User, shortcut: "4" },
+];
+
+const menuItems = [
+  ...navItems,
+  { href: "/feedback", label: "Suggestions", icon: Lightbulb, shortcut: "5" },
 ];
 
 /**
@@ -73,7 +78,7 @@ export function MobileNav() {
 
                 {/* Menu Items */}
                 <nav aria-label="Main" className="flex-1 p-4 space-y-1">
-                  {navItems.map((item) => {
+                  {menuItems.map((item) => {
                     const Icon = item.icon;
                     const active = isActive(item.href);
 

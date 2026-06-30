@@ -28,7 +28,7 @@ declare global {
 
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "";
 
-const BLOCKED_ROUTES = ["/login", "/signup", "/auth", "/privacy", "/settings"];
+const BLOCKED_ROUTES = ["/login", "/signup", "/auth", "/privacy", "/settings", "/profile", "/onboarding"];
 
 export function MetaPixel() {
   const { consent } = useAnalyticsConsent();

@@ -11,6 +11,26 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
+type IOSNavigator = Navigator & { standalone?: boolean };
+type ServiceWorkerContainerWithPeriodicSync = ServiceWorkerContainer & {
+  periodicSync?: unknown;
+};
+type ServiceWorkerRegistrationWithSync = ServiceWorkerRegistration & {
+  sync?: {
+    register: (tag: string) => Promise<void>;
+  };
+};
+type NetworkInformation = EventTarget & {
+  type?: string;
+  effectiveType?: string;
+  saveData?: boolean;
+};
+type NavigatorWithConnection = Navigator & {
+  connection?: NetworkInformation;
+  mozConnection?: NetworkInformation;
+  webkitConnection?: NetworkInformation;
+};
+
 interface PWAState {
   /**
    * Whether the app is running in standalone mode (installed)
@@ -91,8 +111,7 @@ export function usePWA(): PWAState {
     const checkStandalone = () => {
       const standalone =
         window.matchMedia("(display-mode: standalone)").matches ||
-        // @ts-ignore - iOS Safari
-        window.navigator.standalone === true;
+        (window.navigator as IOSNavigator).standalone === true;
       setIsStandalone(standalone);
     };
 
@@ -113,10 +132,18 @@ export function usePWA(): PWAState {
       setCanInstall(true);
     };
 
+    const handleAppInstalled = () => {
+      setCanInstall(false);
+      setDeferredPrompt(null);
+      setIsStandalone(true);
+    };
+
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
 
@@ -127,16 +154,15 @@ export function usePWA(): PWAState {
         setIsServiceWorkerRegistered(true);
       });
 
-      // Check periodic background sync support
-      // @ts-ignore - Periodic background sync is not in all TypeScript definitions
-      if ("periodicSync" in navigator.serviceWorker) {
-        setIsPeriodicSyncSupported(true);
+      const serviceWorker = navigator.serviceWorker as ServiceWorkerContainerWithPeriodicSync;
+      if ("periodicSync" in serviceWorker) {
+        queueMicrotask(() => setIsPeriodicSyncSupported(true));
       }
     }
 
     // Check push notification support
     if ("PushManager" in window) {
-      setIsPushSupported(true);
+      queueMicrotask(() => setIsPushSupported(true));
     }
   }, []);
 
@@ -145,7 +171,7 @@ export function usePWA(): PWAState {
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
 
-    setIsOffline(!navigator.onLine);
+    queueMicrotask(() => setIsOffline(!navigator.onLine));
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
@@ -265,7 +291,7 @@ export function useServiceWorker() {
     }
   }, []);
 
-  const sendMessage = useCallback(async (message: any) => {
+  const sendMessage = useCallback(async (message: unknown) => {
     if (!("serviceWorker" in navigator)) return;
 
     const registration = await navigator.serviceWorker.ready;
@@ -275,10 +301,8 @@ export function useServiceWorker() {
   const sync = useCallback(async (tag: string) => {
     if (!("serviceWorker" in navigator)) return;
 
-    const registration = await navigator.serviceWorker.ready;
-    // @ts-ignore - Background sync might not be in all TypeScript definitions
-    if ("sync" in registration) {
-      // @ts-ignore
+    const registration = await navigator.serviceWorker.ready as ServiceWorkerRegistrationWithSync;
+    if (registration.sync) {
       await registration.sync.register(tag);
     }
   }, []);
@@ -299,8 +323,8 @@ export function useNetworkStatus() {
     const updateConnectionStatus = () => {
       setIsOnline(navigator.onLine);
 
-      // @ts-ignore - Network Information API
-      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      const nav = navigator as NavigatorWithConnection;
+      const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
 
       if (connection) {
         setConnectionType(connection.type || "unknown");
@@ -309,13 +333,13 @@ export function useNetworkStatus() {
       }
     };
 
-    updateConnectionStatus();
+    queueMicrotask(updateConnectionStatus);
 
     window.addEventListener("online", () => setIsOnline(true));
     window.addEventListener("offline", () => setIsOnline(false));
 
-    // @ts-ignore
-    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const nav = navigator as NavigatorWithConnection;
+    const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
     if (connection) {
       connection.addEventListener("change", updateConnectionStatus);
     }

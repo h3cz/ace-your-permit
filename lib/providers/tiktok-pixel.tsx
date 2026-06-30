@@ -34,7 +34,7 @@ declare global {
 
 const TIKTOK_PIXEL_ID = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID ?? "";
 
-const BLOCKED_ROUTES = ["/login", "/signup", "/auth", "/privacy", "/settings"];
+const BLOCKED_ROUTES = ["/login", "/signup", "/auth", "/privacy", "/settings", "/profile", "/onboarding"];
 
 export function TikTokPixel() {
   const { consent } = useAnalyticsConsent();

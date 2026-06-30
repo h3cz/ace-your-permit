@@ -86,7 +86,7 @@ export function StepAssessment({ updateData, onComplete }: StepAssessmentProps) 
         />
 
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-slate-900">Assessment Complete!</h2>
+          <h2 className="text-2xl font-bold text-slate-900">Assessment Complete</h2>
           <p className="text-slate-600">You got {correctCount} out of {ASSESSMENT_QUESTIONS.length} correct</p>
         </div>
 
@@ -109,7 +109,7 @@ export function StepAssessment({ updateData, onComplete }: StepAssessmentProps) 
               strokeDasharray={`${score}, 100`}
               initial={{ strokeDasharray: "0, 100" }}
               animate={{ strokeDasharray: `${score}, 100` }}
-              transition={{ duration: 1, ease: "easeOut" }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 1, ease: "easeOut" }}
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
@@ -166,7 +166,7 @@ export function StepAssessment({ updateData, onComplete }: StepAssessmentProps) 
                     onClick={() => handleAnswer(answer.id)}
                     disabled={selectedAnswer !== null}
                     className={`
-                      w-full p-4 rounded-lg border-2 text-left transition-all
+                      min-h-14 w-full rounded-lg border-2 p-4 text-left transition-all
                       ${showResult && isCorrect
                         ? "border-green-500 bg-green-50"
                         : showResult && isSelected && !isCorrect

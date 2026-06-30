@@ -10,14 +10,21 @@
 // ============================================
 
 import Script from "next/script";
+import { usePathname } from "next/navigation";
 import { useAnalyticsConsent } from "@/lib/providers/analytics-consent";
 
 const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID ?? "";
+const BLOCKED_ROUTES = ["/login", "/signup", "/auth", "/privacy", "/settings", "/profile", "/onboarding"];
 
 export function ClarityScript() {
   const { consent } = useAnalyticsConsent();
+  const pathname = usePathname();
 
-  if (!CLARITY_ID || consent !== "granted") return null;
+  const isBlocked = BLOCKED_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
+  );
+
+  if (!CLARITY_ID || consent !== "granted" || isBlocked) return null;
 
   return (
     <Script
