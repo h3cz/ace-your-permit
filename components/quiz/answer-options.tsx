@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useRef, KeyboardEvent } from "react";
 import { Tables } from "@/types/database";
@@ -20,6 +20,7 @@ export function AnswerOptions({
   isAnswered,
   onSelectAnswer,
 }: AnswerOptionsProps) {
+  const shouldReduceMotion = useReducedMotion();
   // Sort answers by sort_order if available
   const sortedAnswers = [...answers].sort((a, b) => {
     if (a.sort_order !== null && b.sort_order !== null) {
@@ -50,14 +51,13 @@ export function AnswerOptions({
     <div role="radiogroup" aria-label="Answer options" className="space-y-3">
       {sortedAnswers.map((answer, index) => {
         const isSelected = selectedAnswerId === answer.id;
-        const isCorrect = answer.is_correct;
-        const showCorrectness = isAnswered;
+        const showCorrectness = isAnswered && correctAnswerId !== null;
 
-        let buttonClass = "w-full p-4 rounded-xl text-left transition-all border-2 ";
+        let buttonClass = "min-h-14 w-full rounded-xl border-2 p-4 text-left transition-all ";
         let letterClass = "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ";
 
         if (showCorrectness) {
-          if (isCorrect) {
+          if (answer.id === correctAnswerId) {
             // Correct answer
             buttonClass += "border-green-500 bg-green-50";
             letterClass += "bg-green-500 text-white";
@@ -91,16 +91,16 @@ export function AnswerOptions({
             onKeyDown={(e) => handleKeyDown(e, index)}
             disabled={isAnswered}
             className={buttonClass}
-            whileHover={!isAnswered ? { scale: 1.01 } : {}}
-            whileTap={!isAnswered ? { scale: 0.99 } : {}}
-            initial={{ opacity: 0, y: 10 }}
+            whileHover={!isAnswered && !shouldReduceMotion ? { scale: 1.01 } : {}}
+            whileTap={!isAnswered && !shouldReduceMotion ? { scale: 0.99 } : {}}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
+            transition={shouldReduceMotion ? { duration: 0 } : { delay: index * 0.05 }}
           >
             <div className="flex items-center gap-4">
               <div className={letterClass} aria-hidden="true">
                 {showCorrectness ? (
-                  isCorrect ? (
+                  answer.id === correctAnswerId ? (
                     <CheckCircle2 className="w-5 h-5" />
                   ) : isSelected ? (
                     <XCircle className="w-5 h-5" />
@@ -115,7 +115,7 @@ export function AnswerOptions({
               <span
                 className={`flex-1 text-base ${
                   showCorrectness
-                    ? isCorrect
+                    ? answer.id === correctAnswerId
                       ? "text-green-700 font-medium"
                       : isSelected
                       ? "text-red-700"

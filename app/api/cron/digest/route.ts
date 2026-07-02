@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { escapeHtml, hasValidBearerSecret, sanitizeHeaderText } from "@/lib/security";
 
 /**
  * POST /api/cron/digest — Weekly parent progress email digest
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
   try {
     // Verify cron secret — must be first check before any DB access
     const authHeader = request.headers.get("authorization");
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!hasValidBearerSecret(authHeader, process.env.CRON_SECRET)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -66,7 +67,8 @@ export async function POST(request: NextRequest) {
         .eq("id", link.teen_user_id)
         .maybeSingle();
 
-      const teenName = teenProfile?.username || "Your teen";
+      const teenName = sanitizeHeaderText(teenProfile?.username || "Your teen") || "Your teen";
+      const teenNameHtml = escapeHtml(teenName);
       const testDate = teenProfile?.test_date ?? null;
 
       // Get teen's attempts for the past week
@@ -125,7 +127,7 @@ export async function POST(request: NextRequest) {
             html: `
               <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
                 <h1 style="color: #2563EB; font-size: 24px;">Ace Your Permit</h1>
-                <h2 style="font-size: 20px; margin-top: 16px;">${teenName}'s Weekly Progress</h2>
+                <h2 style="font-size: 20px; margin-top: 16px;">${teenNameHtml}'s Weekly Progress</h2>
 
                 <div style="background: #F8FAFC; border-radius: 12px; padding: 20px; margin: 16px 0;">
                   <p style="margin: 8px 0;"><strong>Days studied:</strong> ${daysStudied} of 7</p>
@@ -137,7 +139,7 @@ export async function POST(request: NextRequest) {
                 </div>
 
                 <p style="color: #6B7280; font-size: 14px; margin-top: 24px;">
-                  You're receiving this because you linked your account to ${teenName}'s Ace Your Permit profile.
+                  You're receiving this because you linked your account to ${teenNameHtml}'s Ace Your Permit profile.
                 </p>
               </div>
             `,
@@ -145,7 +147,7 @@ export async function POST(request: NextRequest) {
         });
         sent++;
       } catch (emailErr) {
-        console.error(`Failed to send digest to ${parentEmail}:`, emailErr);
+        console.error(`Failed to send digest for parent link ${link.parent_user_id}:`, emailErr);
         skipped++;
       }
     }

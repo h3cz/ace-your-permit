@@ -3,9 +3,10 @@
 import { useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { QuestionWithAnswers } from "@/types/database";
-import { calculateXP, XPCalculationResult } from "@/lib/gamification/xp-calculator";
+import { calculateXP } from "@/lib/gamification/xp-calculator";
 import { QuizAnswer, QuizResults } from "../use-quiz";
 import { toast } from "sonner";
+import { getCategoryName } from "@/lib/data/questions/categories";
 
 /**
  * useQuizSubmission — Handles answer submission, DB persistence, and XP calculation
@@ -146,7 +147,10 @@ export function useQuizSubmission({ userId }: UseQuizSubmissionOptions) {
       if (!answer.isCorrect && questions[index]) {
         const catId = String(questions[index].category_id ?? "unknown");
         if (!categoryStats[catId]) {
-          categoryStats[catId] = { name: "Unknown", wrongCount: 0 };
+          categoryStats[catId] = {
+            name: catId === "unknown" ? "Mixed Topics" : getCategoryName(catId),
+            wrongCount: 0,
+          };
         }
         categoryStats[catId].wrongCount++;
       }
@@ -192,17 +196,15 @@ export function useQuizSubmission({ userId }: UseQuizSubmissionOptions) {
           streak_count: maxStreak,
         });
 
-        const { data: userStats } = await supabase
-          .from("user_stats")
-          .select("total_xp")
-          .eq("user_id", userId)
-          .single();
+        if (xpResult.totalXP > 0) {
+          const { error: xpError } = await supabase.rpc("increment_total_xp", {
+            user_id: userId,
+            xp_amount: xpResult.totalXP,
+          });
 
-        if (userStats) {
-          await supabase
-            .from("user_stats")
-            .update({ total_xp: userStats.total_xp + xpResult.totalXP })
-            .eq("user_id", userId);
+          if (xpError) {
+            console.error("Failed to increment total_xp:", xpError);
+          }
         }
       } catch (err) {
         console.error("Failed to save quiz session:", err);

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MobileLayout } from "@/components/mobile-layout";
@@ -61,6 +61,7 @@ function loadResults(): QuizResults | null {
 export default function QuizResultsPage() {
   const router = useRouter();
   const mascot = useMascot({ autoHideDelay: 5000 });
+  const shouldReduceMotion = useReducedMotion();
   const [showXPBreakdown, setShowXPBreakdown] = useState(false);
   const [animatedXP, setAnimatedXP] = useState(0);
 
@@ -100,14 +101,14 @@ export default function QuizResultsPage() {
     if (isPassing) {
       mascot.show(
         "excited",
-        `Congratulations! You passed with ${results.accuracy}%! 🎉`,
-        "Great Job!"
+        `You passed with ${results.accuracy}%. That's road-ready energy 🎉`,
+        "Great Job"
       );
     } else {
       mascot.show(
         "encouraging",
-        `You scored ${results.accuracy}% — keep grinding and you'll nail it! 💪`,
-        "So Close!"
+        `${results.accuracy}% today. Review the misses, then run it back 💪`,
+        "So Close"
       );
     }
 
@@ -147,9 +148,9 @@ export default function QuizResultsPage() {
 
         {/* Score Card */}
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
+          initial={shouldReduceMotion ? false : { scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.5 }}
         >
           <Card
             className={`border-0 shadow-lg ${
@@ -160,9 +161,9 @@ export default function QuizResultsPage() {
           >
             <CardContent className="p-6 text-center">
               <motion.div
-                initial={{ scale: 0 }}
+                initial={shouldReduceMotion ? false : { scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                transition={shouldReduceMotion ? { duration: 0 } : { delay: 0.3, type: "spring", stiffness: 200 }}
                 className="w-20 h-20 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center"
               >
                 {isPassing ? (
@@ -173,12 +174,12 @@ export default function QuizResultsPage() {
               </motion.div>
               
               <h2 className="text-3xl font-bold mb-1">
-                {isPassing ? "Great Job!" : "Keep Practicing!"}
+                {isPassing ? "Great Job" : "Keep Practicing"}
               </h2>
               <p className="text-white/80 mb-4">
                 {isPassing
-                  ? "You passed the quiz!"
-                  : "You're getting closer to passing!"}
+                  ? "You passed the quiz."
+                  : "You're getting closer to passing."}
               </p>
 
               <div className="flex items-center justify-center gap-2 mb-4">
@@ -193,7 +194,7 @@ export default function QuizResultsPage() {
                 </span>
                 <span className="flex items-center gap-1 bg-white/20 px-3 py-1 rounded-full">
                   <XCircle className="w-4 h-4" />
-                  {results.wrongAnswers} wrong
+                  {results.wrongAnswers} misses
                 </span>
               </div>
             </CardContent>
@@ -202,9 +203,9 @@ export default function QuizResultsPage() {
 
         {/* XP Earned */}
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
+          initial={shouldReduceMotion ? false : { y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { delay: 0.2 }}
         >
           <Card className="border-0 shadow-md">
             <CardHeader className="pb-3">
@@ -232,9 +233,9 @@ export default function QuizResultsPage() {
 
               {showXPBreakdown && (
                 <motion.div
-                  initial={{ height: 0, opacity: 0 }}
+                  initial={shouldReduceMotion ? false : { height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
+                  exit={shouldReduceMotion ? undefined : { height: 0, opacity: 0 }}
                   className="space-y-2 border-t pt-4"
                 >
                   {results.xpEarned.breakdown.map((item, index) => (
@@ -263,9 +264,9 @@ export default function QuizResultsPage() {
 
         {/* Stats Grid */}
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
+          initial={shouldReduceMotion ? false : { y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { delay: 0.3 }}
           className="grid grid-cols-3 gap-3"
         >
           <Card className="border-0 shadow-sm">
@@ -300,13 +301,13 @@ export default function QuizResultsPage() {
         {/* Weak Areas */}
         {results.weakCategories.length > 0 && (
           <motion.div
-            initial={{ y: 20, opacity: 0 }}
+            initial={shouldReduceMotion ? false : { y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={shouldReduceMotion ? { duration: 0 } : { delay: 0.4 }}
           >
             <Card className="border-0 shadow-md">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Areas to Improve</CardTitle>
+                <CardTitle className="text-lg">Questions to Revisit</CardTitle>
               </CardHeader>
               <CardContent className="pt-0 space-y-3">
                 {results.weakCategories.map((category) => (
@@ -319,7 +320,7 @@ export default function QuizResultsPage() {
                         {category.categoryName}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {category.wrongCount} questions missed
+                        {category.wrongCount} misses
                       </p>
                     </div>
                     <Link href={`/quiz/category/${category.categoryId}`}>
@@ -337,9 +338,9 @@ export default function QuizResultsPage() {
 
         {/* Action Buttons */}
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
+          initial={shouldReduceMotion ? false : { y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={shouldReduceMotion ? { duration: 0 } : { delay: 0.5 }}
           className="space-y-3"
         >
           <Button
@@ -359,7 +360,7 @@ export default function QuizResultsPage() {
                 if (navigator.share) {
                   navigator.share({
                     title: "My Quiz Results",
-                    text: `I scored ${results.accuracy}% on my driving test practice quiz!`,
+                    text: `I scored ${results.accuracy}% on my driving test practice quiz.`,
                   });
                 }
               }}

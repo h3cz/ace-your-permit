@@ -18,7 +18,9 @@ import {
   getQuestionById,
   getPracticeTestQuestions,
   getAdaptiveQuestions,
+  isValidCategoryId,
 } from './questions';
+import type { CategoryId } from './questions';
 
 /**
  * Question cache for performance
@@ -59,6 +61,14 @@ class QuestionCache {
 }
 
 const cache = new QuestionCache();
+
+function requireCategoryId(categoryId?: string): CategoryId {
+  if (!categoryId || !isValidCategoryId(categoryId)) {
+    throw new Error('Valid category ID required for category mode');
+  }
+
+  return categoryId;
+}
 
 /**
  * Generate cache key from filter
@@ -143,8 +153,7 @@ export function loadQuizQuestions(config: QuizSessionConfig): Question[] {
       return getPracticeTestQuestions(questionCount);
     
     case 'category':
-      if (!categoryId) throw new Error('Category ID required for category mode');
-      return getQuestionsByCategory(categoryId as any).slice(0, questionCount);
+      return getQuestionsByCategory(requireCategoryId(categoryId)).slice(0, questionCount);
     
     case 'adaptive':
       return getAdaptiveQuestions(userPerformance || { easy: 0.8, medium: 0.6, hard: 0.4 }, questionCount);
@@ -171,7 +180,7 @@ export function calculateCategoryStats(
   categoryId: string,
   userProgress: UserQuestionProgress[]
 ): CategoryStats {
-  const categoryQuestions = getQuestionsByCategory(categoryId as any);
+  const categoryQuestions = getQuestionsByCategory(requireCategoryId(categoryId));
   const totalQuestions = categoryQuestions.length;
   
   const categoryProgress = userProgress.filter(p => 

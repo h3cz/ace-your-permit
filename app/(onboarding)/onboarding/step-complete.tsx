@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import {
   Sparkles
 } from "lucide-react";
 import Link from "next/link";
+import { ONBOARDING_STEPS } from "@/lib/constants/onboarding";
 
 interface StepCompleteProps {
   data: OnboardingData;
@@ -34,6 +35,7 @@ const confettiPieces = Array.from({ length: 20 }, (_, i) => ({
 
 export function StepComplete({ data, onComplete }: StepCompleteProps) {
   const shouldReduceMotion = useReducedMotion();
+  const completionQueuedRef = useRef(false);
   // window is not available during SSR — default to a sensible viewport height
   // and populate the real value on mount. Used by confetti fall animation.
   const [viewportHeight, setViewportHeight] = useState<number>(800);
@@ -43,13 +45,23 @@ export function StepComplete({ data, onComplete }: StepCompleteProps) {
 
     // Complete the step automatically
     const timer = setTimeout(() => {
+      if (completionQueuedRef.current) return;
+      completionQueuedRef.current = true;
       onComplete();
     }, 500);
 
     return () => clearTimeout(timer);
   }, [onComplete]);
 
-  const xpEarned = 150; // Total onboarding XP
+  const completedStepIndexes = Array.isArray(data.stepsCompleted)
+    ? data.stepsCompleted.filter((step): step is number => typeof step === "number")
+    : [];
+  const completedXp = completedStepIndexes.reduce(
+    (sum, stepIndex) => sum + (ONBOARDING_STEPS[stepIndex]?.xpReward ?? 0),
+    0
+  );
+  const finalStepXp = ONBOARDING_STEPS.at(-1)?.xpReward ?? 0;
+  const xpEarned = completedXp + finalStepXp;
   const assessmentScore =
     typeof data.assessmentScore === "number"
       ? data.assessmentScore
@@ -117,10 +129,10 @@ export function StepComplete({ data, onComplete }: StepCompleteProps) {
         transition={shouldReduceMotion ? { duration: 0 } : { delay: 0.3 }}
       >
         <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
-          You&apos;re All Set!
+          You&apos;re All Set
         </h1>
         <p className="text-lg text-muted-foreground mt-2">
-          Welcome to Ace Your Permit, Driver!
+          Welcome to Ace Your Permit, driver.
         </p>
       </motion.div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useId } from "react";
 import { QuestionWithAnswers } from "@/types/database";
 import { QuizAnswer } from "../use-quiz";
 
@@ -22,7 +22,9 @@ interface UseQuizStateOptions {
 export function useQuizState(options: UseQuizStateOptions) {
   const { quizType, categoryId, timeLimit } = options;
 
-  const sessionIdRef = useRef(`quiz_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  const baseSessionId = useId().replace(/:/g, "");
+  const [sessionVersion, setSessionVersion] = useState(0);
+  const sessionId = `quiz_${baseSessionId}_${sessionVersion}`;
 
   const [questions, setQuestions] = useState<QuestionWithAnswers[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -30,7 +32,7 @@ export function useQuizState(options: UseQuizStateOptions) {
   const [currentAnswer, setCurrentAnswer] = useState<number | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-  const [questionStartTime, setQuestionStartTime] = useState(Date.now());
+  const [questionStartTime, setQuestionStartTime] = useState(() => Date.now());
   const [totalTimeTaken, setTotalTimeTaken] = useState(0);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [maxStreak, setMaxStreak] = useState(0);
@@ -80,7 +82,7 @@ export function useQuizState(options: UseQuizStateOptions) {
   }, []);
 
   const resetState = useCallback(() => {
-    sessionIdRef.current = `quiz_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    setSessionVersion((prev) => prev + 1);
     setQuestions([]);
     setCurrentQuestionIndex(0);
     setAnswers([]);
@@ -115,7 +117,7 @@ export function useQuizState(options: UseQuizStateOptions) {
     maxStreak,
     flaggedQuestions,
     isComplete,
-    sessionId: sessionIdRef.current,
+    sessionId,
     quizType,
     categoryId,
     timeLimit: timeLimit ? timeLimit * 60 : undefined,

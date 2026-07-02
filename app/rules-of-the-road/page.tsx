@@ -262,8 +262,8 @@ export default function RulesOfTheRoadPage() {
             </h2>
             <p className="text-gray-700 leading-relaxed">
               Before you ever start an engine, Illinois requires you to hold the right credential
-              for your age. Teens aged 15 with an approved driver's education enrollment can apply
-              for an Instruction Permit. Without driver's ed, the minimum age rises to 17 years and
+              for your age. Teens aged 15 with an approved driver&apos;s education enrollment can apply
+              for an Instruction Permit. Without driver&apos;s ed, the minimum age rises to 17 years and
               3 months. The permit lets you practice with a licensed driver (age 21+) in the front
               seat at all times.
             </p>
@@ -293,8 +293,8 @@ export default function RulesOfTheRoadPage() {
             <p className="text-gray-700 leading-relaxed">
               Speed limits in Illinois default to 30 mph in urban areas and 65 mph on most rural
               interstates — but posted limits always override. School zones drop to 20 mph when children
-              are present. The "Basic Speed Rule" means you can be cited for driving too fast for
-              conditions even if you're under the posted limit during rain, fog, or construction.
+              are present. The &quot;Basic Speed Rule&quot; means you can be cited for driving too fast for
+              conditions even if you&apos;re under the posted limit during rain, fog, or construction.
             </p>
             <p className="text-gray-700 leading-relaxed">
               Cell phone laws are strict for new drivers: teens under 19 may not use a handheld device
@@ -336,13 +336,13 @@ export default function RulesOfTheRoadPage() {
             </p>
             <p className="text-gray-700 leading-relaxed">
               Emergency vehicles (lights/sirens active) require you to pull to the right and stop until
-              they pass. Scott's Law — Illinois's "Move Over" law — additionally requires drivers to
+              they pass. Scott&apos;s Law — Illinois&apos;s &quot;Move Over&quot; law — additionally requires drivers to
               slow down and change lanes away from emergency and maintenance vehicles stopped on the
-              roadside. Violating Scott's Law carries heavy fines and potential license suspension.
+              roadside. Violating Scott&apos;s Law carries heavy fines and potential license suspension.
             </p>
             <p className="text-gray-700 leading-relaxed">
               Large trucks have massive blind spots: front 20 feet, rear 30 feet, and both sides. If you
-              can't see the truck's mirrors, the driver can't see you. Never cut in front of a truck
+              can&apos;t see the truck&apos;s mirrors, the driver can&apos;t see you. Never cut in front of a truck
               suddenly, and give extra following distance — a fully loaded semi needs nearly twice the
               stopping distance of a passenger car.
             </p>
@@ -373,7 +373,7 @@ export default function RulesOfTheRoadPage() {
               Chapter 6: Crashes, DUI & Implied Consent
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              Illinois's DUI laws are among the toughest in the nation for new drivers. The standard
+              Illinois&apos;s DUI laws are among the toughest in the nation for new drivers. The standard
               Blood Alcohol Concentration (BAC) limit is 0.08% for drivers 21+. For drivers under 21,
               Illinois enforces a Zero Tolerance law: any measurable BAC (0.00%) results in an automatic
               license suspension. A first DUI conviction brings a minimum one-year license revocation.
@@ -423,8 +423,8 @@ export default function RulesOfTheRoadPage() {
               Sample Practice Questions
             </h2>
             <p className="text-gray-600 text-center mb-10">
-              These are real questions from Ace Your Permit's bank — drawn directly from the Illinois
-              handbook chapters above. Click "Show Answer" to check yourself.
+              These are real questions from Ace Your Permit&apos;s bank — drawn directly from the Illinois
+              handbook chapters above. Click &quot;Show Answer&quot; to check yourself.
             </p>
             <div className="space-y-6">
               {sampleQuestions.map((q, idx) => (

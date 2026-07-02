@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { LEAGUES, LEAGUE_ORDER, getLeagueByXP } from "@/lib/gamification/leagues";
+import { LEAGUES, LEAGUE_ORDER } from "@/lib/gamification/leagues";
+import { hasValidBearerSecret } from "@/lib/security";
 
 /**
  * GET /api/leaderboard/leagues
  * Get league information and user's current league status
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient();
 
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
     
     // Verify this is an admin or cron job request
     const authHeader = request.headers.get("authorization");
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!hasValidBearerSecret(authHeader, process.env.CRON_SECRET)) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }

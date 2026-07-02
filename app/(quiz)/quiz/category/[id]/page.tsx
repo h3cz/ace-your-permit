@@ -11,6 +11,7 @@ import { Dash } from "@/components/mascot";
 import { useMascot } from "@/hooks/use-mascot";
 import { useQuiz } from "@/hooks/use-quiz";
 import { createClient } from "@/lib/supabase/client";
+import { getCategoryName } from "@/lib/data/questions/categories";
 import {
   QuestionCard,
   AnswerOptions,
@@ -22,17 +23,9 @@ import {
 import { LoadingSpinner } from "@/components/loading-spinner";
 import { ArrowLeft, Trophy, Target, BookOpen } from "lucide-react";
 
-// Category info mapping — keyed by the string slugs used across lib/data/questions.
-const CATEGORY_INFO: Record<string, { name: string; icon: typeof Target; color: string }> = {
-  "traffic-signs": { name: "Traffic Signs & Signals", icon: Target, color: "text-red-600" },
-  "traffic-laws": { name: "Traffic Laws & Rules of the Road", icon: BookOpen, color: "text-blue-600" },
-  "safe-driving": { name: "Safe Driving Practices", icon: Target, color: "text-green-600" },
-  "alcohol-drugs": { name: "Alcohol & Drug Laws", icon: Target, color: "text-yellow-600" },
-  "vehicle-equipment": { name: "Vehicle Equipment & Maintenance", icon: Target, color: "text-purple-600" },
-  "sharing-road": { name: "Sharing the Road", icon: Target, color: "text-pink-600" },
-  "parking-emergency": { name: "Parking & Emergency Situations", icon: Target, color: "text-amber-600" },
-  "road-conditions": { name: "Road Conditions & Weather", icon: Target, color: "text-cyan-600" },
-  "illinois-specific": { name: "Illinois-Specific Laws", icon: Target, color: "text-teal-600" },
+const CATEGORY_ICONS: Record<string, typeof Target> = {
+  "traffic-laws": BookOpen,
+  "traffic-signs": Target,
 };
 
 export default function CategoryQuizPage() {
@@ -40,6 +33,11 @@ export default function CategoryQuizPage() {
   const params = useParams();
   const categoryId = params.id as string;
   const mascot = useMascot({ autoHideDelay: 4000 });
+  const {
+    show: showMascot,
+    celebrate: celebrateMascot,
+    encourage: encourageMascot,
+  } = mascot;
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [authChecked, setAuthChecked] = useState(false);
 
@@ -55,10 +53,10 @@ export default function CategoryQuizPage() {
     });
   }, [router]);
 
-  const categoryInfo = CATEGORY_INFO[categoryId] || {
-    name: "Category Practice",
-    icon: Target,
-    color: "text-blue-600"
+  const categoryInfo = {
+    name: getCategoryName(categoryId),
+    icon: CATEGORY_ICONS[categoryId] || Target,
+    color: "text-blue-600",
   };
   const CategoryIcon = categoryInfo.icon;
 
@@ -75,19 +73,19 @@ export default function CategoryQuizPage() {
     if (quiz.isAnswered) {
       if (quiz.isCorrect) {
         if (quiz.currentStreak >= 3) {
-          mascot.show(
+          showMascot(
             "excited",
             `Amazing! That's ${quiz.currentStreak} correct in a row! 🔥`,
             "Streak!"
           );
         } else {
-          mascot.celebrate();
+          celebrateMascot();
         }
       } else {
-        mascot.encourage();
+        encourageMascot();
       }
     }
-  }, [quiz.isAnswered, quiz.isCorrect, quiz.currentStreak]);
+  }, [quiz.isAnswered, quiz.isCorrect, quiz.currentStreak, showMascot, celebrateMascot, encourageMascot]);
 
   // Handle quiz completion
   useEffect(() => {
@@ -95,22 +93,22 @@ export default function CategoryQuizPage() {
       const percentage = quiz.results.accuracy;
       
       if (percentage >= 80) {
-        mascot.show(
+        showMascot(
           "excited",
-          `Excellent! You mastered ${categoryInfo.name} with ${percentage}%! 🎉`,
-          "Category Mastered!"
+          `${categoryInfo.name} is looking sharp at ${percentage}% 🎉`,
+          "Category Clear"
         );
       } else if (percentage >= 60) {
-        mascot.show(
+        showMascot(
           "happy",
-          `Good progress on ${categoryInfo.name}! You scored ${percentage}%.`,
-          "Keep Learning!"
+          `${percentage}% on ${categoryInfo.name}. A few more reps and this gets smooth.`,
+          "Good Progress"
         );
       } else {
-        mascot.show(
+        showMascot(
           "encouraging",
-          `Keep practicing ${categoryInfo.name}! You'll get better with time! 💪`,
-          "Don't Give Up!"
+          `${categoryInfo.name} needs another lap. Review the misses and come back stronger 💪`,
+          "Keep Going"
         );
       }
 
@@ -126,18 +124,18 @@ export default function CategoryQuizPage() {
 
       return () => clearTimeout(timeout);
     }
-  }, [quiz.isComplete, quiz.results, categoryInfo.name]);
+  }, [quiz.isComplete, quiz.results, categoryInfo.name, showMascot, router]);
 
   // Welcome message
   useEffect(() => {
     if (!quiz.isLoading && quiz.questions.length > 0) {
-      mascot.show(
+      showMascot(
         "happy",
-        `Let's practice ${categoryInfo.name}! Focus on this category to improve your skills.`,
+        `Let's lock in ${categoryInfo.name}. One category, clean focus.`,
         categoryInfo.name
       );
     }
-  }, [quiz.isLoading, quiz.questions.length, categoryInfo.name]);
+  }, [quiz.isLoading, quiz.questions.length, categoryInfo.name, showMascot]);
 
   if (quiz.isLoading) {
     return (
@@ -303,6 +301,7 @@ export default function CategoryQuizPage() {
           onNext={quiz.nextQuestion}
           onSubmit={quiz.submitAnswer}
           onExit={() => router.push("/quiz")}
+          onComplete={quiz.completeQuiz}
           onFlag={() => quiz.flagQuestion(quiz.currentQuestionIndex)}
           isFlagged={quiz.flaggedQuestions.includes(quiz.currentQuestionIndex)}
           canGoBack={quiz.canGoBack}

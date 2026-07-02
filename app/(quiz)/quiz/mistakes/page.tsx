@@ -26,6 +26,7 @@ import { ArrowLeft, Trophy, RotateCcw, CheckCircle2, Brain } from "lucide-react"
 export default function MistakesQuizPage() {
   const router = useRouter();
   const mascot = useMascot({ autoHideDelay: 4000 });
+  const { show: showMascot } = mascot;
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [authChecked, setAuthChecked] = useState(false);
 
@@ -52,20 +53,20 @@ export default function MistakesQuizPage() {
   useEffect(() => {
     if (quiz.isAnswered) {
       if (quiz.isCorrect) {
-        mascot.show(
+        showMascot(
           "excited",
-          "Great job! You got it right this time! Keep it up! 🎉",
-          "Mastered!"
+          "Nice. That one moved from shaky to handled 🎉",
+          "Mastered"
         );
       } else {
-        mascot.show(
+        showMascot(
           "encouraging",
-          "Don't worry! Review the explanation and try again next time! 💪",
-          "Keep Learning!"
+          "Close but not locked yet. Read the why, then let it stick 💪",
+          "Keep Learning"
         );
       }
     }
-  }, [quiz.isAnswered, quiz.isCorrect]);
+  }, [quiz.isAnswered, quiz.isCorrect, showMascot]);
 
   // Handle quiz completion
   useEffect(() => {
@@ -74,16 +75,16 @@ export default function MistakesQuizPage() {
       const totalReviewed = quiz.results.totalQuestions;
       
       if (masteredCount === totalReviewed) {
-        mascot.show(
+        showMascot(
           "excited",
-          `Amazing! You mastered all ${totalReviewed} questions! You're crushing it! 🏆`,
-          "All Mastered!"
+          `You mastered all ${totalReviewed} review questions. Clean sweep 🏆`,
+          "All Mastered"
         );
       } else {
-        mascot.show(
+        showMascot(
           "happy",
-          `You mastered ${masteredCount} out of ${totalReviewed} questions. Keep practicing!`,
-          "Good Progress!"
+          `You mastered ${masteredCount} of ${totalReviewed}. The rest are queued for a comeback.`,
+          "Good Progress"
         );
       }
 
@@ -99,18 +100,18 @@ export default function MistakesQuizPage() {
 
       return () => clearTimeout(timeout);
     }
-  }, [quiz.isComplete, quiz.results]);
+  }, [quiz.isComplete, quiz.results, showMascot, router]);
 
   // Welcome message
   useEffect(() => {
     if (!quiz.isLoading && quiz.questions.length > 0) {
-      mascot.show(
+      showMascot(
         "thinking",
-        "Let's review the questions you got wrong before. Learning from mistakes is the best way to improve!",
-        "Review Time!"
+        "Let's review your missed questions. This is where scores jump.",
+        "Review Time"
       );
     }
-  }, [quiz.isLoading, quiz.questions.length]);
+  }, [quiz.isLoading, quiz.questions.length, showMascot]);
 
   if (quiz.isLoading) {
     return (
@@ -162,10 +163,10 @@ export default function MistakesQuizPage() {
             <CheckCircle2 className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-2">
-            No Mistakes to Review!
+            No Misses to Review
           </h2>
           <p className="text-muted-foreground mb-6 max-w-sm">
-            Great job! You haven't made any mistakes yet, or you've already mastered all the questions you got wrong.
+            Nice work. You either have no misses yet, or you already mastered the ones you revisited.
           </p>
           <div className="space-y-3 w-full max-w-xs">
             <Link href="/quiz/practice">
@@ -232,8 +233,8 @@ export default function MistakesQuizPage() {
             <div className="flex items-center gap-2 text-accent">
               <RotateCcw className="w-5 h-5" />
               <span className="text-sm">
-                <strong>Review Mode:</strong> These are questions you got wrong before.
-                Get them right to master them!
+                <strong>Review Mode:</strong> These are questions you missed before.
+                Get them right to master them.
               </span>
             </div>
           </CardContent>
@@ -289,6 +290,7 @@ export default function MistakesQuizPage() {
           onNext={quiz.nextQuestion}
           onSubmit={quiz.submitAnswer}
           onExit={() => router.push("/quiz")}
+          onComplete={quiz.completeQuiz}
           onFlag={() => quiz.flagQuestion(quiz.currentQuestionIndex)}
           isFlagged={quiz.flaggedQuestions.includes(quiz.currentQuestionIndex)}
           canGoBack={quiz.canGoBack}

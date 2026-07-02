@@ -14,7 +14,6 @@ import { createClient } from "@/lib/supabase/client";
 import {
   QuestionCard,
   AnswerOptions,
-  QuizProgress,
   ExplanationCard,
   QuizControls,
   StreakIndicator,
@@ -25,6 +24,11 @@ import { ArrowLeft, Trophy, Infinity, Pause } from "lucide-react";
 export default function MarathonQuizPage() {
   const router = useRouter();
   const mascot = useMascot({ autoHideDelay: 4000 });
+  const {
+    show: showMascot,
+    celebrate: celebrateMascot,
+    encourage: encourageMascot,
+  } = mascot;
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [authChecked, setAuthChecked] = useState(false);
 
@@ -54,33 +58,33 @@ export default function MarathonQuizPage() {
         // Milestone celebrations
         const milestones = [10, 25, 50, 75, 100];
         if (milestones.includes(quiz.currentQuestionIndex + 1)) {
-          mascot.show(
+          showMascot(
             "excited",
-            `Amazing! You've answered ${quiz.currentQuestionIndex + 1} questions! Keep going! 🎉`,
-            "Milestone!"
+            `${quiz.currentQuestionIndex + 1} questions down. Marathon legs are warming up 🎉`,
+            "Milestone"
           );
         } else if (quiz.currentStreak >= 5) {
-          mascot.show(
+          showMascot(
             "excited",
-            `Incredible streak! ${quiz.currentStreak} in a row! 🔥`,
-            "On Fire!"
+            `${quiz.currentStreak} in a row. That's the zone 🔥`,
+            "On Fire"
           );
         } else {
-          mascot.celebrate();
+          celebrateMascot();
         }
       } else {
-        mascot.encourage();
+        encourageMascot();
       }
     }
-  }, [quiz.isAnswered, quiz.isCorrect, quiz.currentStreak, quiz.currentQuestionIndex]);
+  }, [quiz.isAnswered, quiz.isCorrect, quiz.currentStreak, quiz.currentQuestionIndex, showMascot, celebrateMascot, encourageMascot]);
 
   // Handle quiz completion
   useEffect(() => {
     if (quiz.isComplete && quiz.results) {
-      mascot.show(
+      showMascot(
         "excited",
-        `Marathon complete! You answered ${quiz.results.totalQuestions} questions! You're a true champion! 🏆`,
-        "Marathon Complete!"
+        `Marathon complete. ${quiz.results.totalQuestions} questions handled 🏆`,
+        "Marathon Complete"
       );
 
       // Store results in sessionStorage for the results page
@@ -95,7 +99,7 @@ export default function MarathonQuizPage() {
 
       return () => clearTimeout(timeout);
     }
-  }, [quiz.isComplete, quiz.results]);
+  }, [quiz.isComplete, quiz.results, showMascot, router]);
 
   if (quiz.isLoading) {
     return (
@@ -251,6 +255,7 @@ export default function MarathonQuizPage() {
           onNext={quiz.nextQuestion}
           onSubmit={quiz.submitAnswer}
           onExit={() => router.push("/quiz")}
+          onComplete={quiz.completeQuiz}
           onFlag={() => quiz.flagQuestion(quiz.currentQuestionIndex)}
           isFlagged={quiz.flaggedQuestions.includes(quiz.currentQuestionIndex)}
           canGoBack={quiz.canGoBack}
@@ -270,7 +275,7 @@ export default function MarathonQuizPage() {
             <div className="flex items-center justify-center gap-2 text-yellow-700">
               <Pause className="w-4 h-4" />
               <span className="text-sm">
-                You've answered {quiz.currentQuestionIndex} questions! Consider taking a short break.
+                {quiz.currentQuestionIndex} questions down. A short break is allowed.
               </span>
             </div>
           </div>

@@ -6,9 +6,10 @@ import { Redis } from "@upstash/redis";
  * Rate limiting with graceful degradation.
  *
  * If UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN are present, we enforce
- * sliding-window limits backed by Upstash Redis. If either is missing (local
- * dev, CI without secrets, etc.) every call becomes a no-op so builds and
- * local runs are never blocked.
+ * sliding-window limits backed by Upstash Redis. If either is missing, we fall
+ * back to a bounded in-memory limiter. The fallback is per-instance, so Upstash
+ * is still preferred for production-wide enforcement, but routes stay protected
+ * and usable while secrets are being configured.
  *
  * Usage:
  *   const rl = getRateLimiter("parent:generate", 5, 60 * 60);
@@ -39,9 +40,44 @@ function hasUpstashEnv(): boolean {
   );
 }
 
-function createStubLimiter(limit: number): RateLimiter {
+function createMemoryLimiter(limit: number, windowSeconds: number): RateLimiter {
+  const buckets = new Map<string, { count: number; resetAt: number }>();
+  const maxBuckets = 10_000;
+
   return {
-    limit: async () => ({ success: true, remaining: limit, retryAfter: 0 }),
+    limit: async (identifier: string) => {
+      const now = Date.now();
+      let bucket = buckets.get(identifier);
+
+      if (!bucket || bucket.resetAt <= now) {
+        bucket = {
+          count: 0,
+          resetAt: now + windowSeconds * 1000,
+        };
+        buckets.set(identifier, bucket);
+      }
+
+      bucket.count += 1;
+
+      if (buckets.size > maxBuckets) {
+        for (const [key, value] of buckets) {
+          if (value.resetAt <= now) buckets.delete(key);
+          if (buckets.size <= maxBuckets) break;
+        }
+      }
+
+      const retryAfter = Math.max(
+        0,
+        Math.ceil((bucket.resetAt - now) / 1000)
+      );
+      const remaining = Math.max(0, limit - bucket.count);
+
+      return {
+        success: bucket.count <= limit,
+        remaining,
+        retryAfter: bucket.count <= limit ? 0 : retryAfter,
+      };
+    },
   };
 }
 
@@ -94,10 +130,10 @@ export function getRateLimiter(
     if (!warnedAboutMissingEnv) {
       warnedAboutMissingEnv = true;
       console.warn(
-        "[ratelimit] UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN not set — rate limiting is a no-op."
+        "[ratelimit] UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN not set; using per-instance memory fallback."
       );
     }
-    limiter = createStubLimiter(limit);
+    limiter = createMemoryLimiter(limit, windowSeconds);
   }
 
   limiters.set(cacheKey, limiter);

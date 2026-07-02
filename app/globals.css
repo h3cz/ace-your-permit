@@ -82,15 +82,16 @@
   --safe-area-left: env(safe-area-inset-left, 0px);
   --safe-area-right: env(safe-area-inset-right, 0px);
 
-  /* DriveMaster Typography Scale */
-  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
-  --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
-  --text-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
-  --text-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
-  --text-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
-  --text-2xl: clamp(1.5rem, 1.25rem + 1.25vw, 2rem);
-  --text-3xl: clamp(1.875rem, 1.5rem + 1.875vw, 2.5rem);
-  --text-4xl: clamp(2.25rem, 1.75rem + 2.5vw, 3rem);
+  /* Ace Your Permit Typography Scale (fixed per DESIGN.md) */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 3rem;
+  --text-5xl: 4.5rem;
 
   /* DriveMaster Animation Durations */
   --duration-fast: 150ms;
@@ -102,17 +103,17 @@
 :root {
   --radius: 0.625rem;
   --background: #F8FAFC;
-  --foreground: #1E293B;
+  --foreground: #0F172A;
   --card: #FFFFFF;
-  --card-foreground: #1E293B;
+  --card-foreground: #0F172A;
   --popover: #FFFFFF;
-  --popover-foreground: #1E293B;
+  --popover-foreground: #0F172A;
   --primary: #2563EB;
   --primary-foreground: #FFFFFF;
   --secondary: #F1F5F9;
-  --secondary-foreground: #1E293B;
+  --secondary-foreground: #0F172A;
   --muted: #F1F5F9;
-  --muted-foreground: #6B7280;
+  --muted-foreground: #475569;
   --accent: #F97316;
   --accent-foreground: #FFFFFF;
   --destructive: #EF4444;
@@ -137,7 +138,7 @@
   --success: #10B981;
   --warning: #F59E0B;
   --gold: #FBBF24;
-  --neutral: #6B7280;
+  --neutral: #475569;
 
   /* DriveMaster Sidebar Variables */
   --sidebar-width: 16rem;
@@ -154,9 +155,9 @@
   ─────────────────────────────────────────────────────────────────────── */
 
   /* Surfaces — slight blue-tint so dark mode feels *designed*, not auto-inverted */
-  --background: #0A0F1E;         /* brand-navy-950 — deeper than slate-900 */
+  --background: #0F172A;         /* DESIGN.md dark background */
   --foreground: #F1F5F9;         /* zinc-100 — high contrast, not cold white */
-  --card: #131C30;               /* brand-navy-900 — lifted surface, distinct from bg */
+  --card: #1E293B;               /* lifted surface, distinct from bg */
   --card-foreground: #F1F5F9;
   --popover: #1A2540;            /* slightly lighter than card for layering */
   --popover-foreground: #F1F5F9;
@@ -168,7 +169,7 @@
   /* Orange accent: shift to #FB923C (orange-400) in dark — stays saturated,
      doesn't look muddy the way #EA580C does on a very dark bg */
   --accent: #FB923C;             /* orange-400 — full saturation, pops on dark navy */
-  --accent-foreground: #0A0F1E;  /* dark text on bright orange for max contrast */
+  --accent-foreground: #0F172A;  /* dark text on bright orange for max contrast */
 
   /* Semantic */
   --destructive: #F87171;        /* red-400 — visible on dark bg */
@@ -244,7 +245,7 @@
 [data-theme="light"],
 [data-theme="light"] * {
   --foreground: #1E293B;
-  --muted-foreground: #6B7280;
+  --muted-foreground: #475569;
   --card: #ffffff;
   --card-foreground: #1E293B;
   --popover: #ffffff;

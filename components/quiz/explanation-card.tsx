@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, AlertCircle, Lightbulb } from "lucide-react";
 
@@ -15,11 +15,13 @@ export function ExplanationCard({
   explanation,
   correctAnswer,
 }: ExplanationCardProps) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
     >
       <Card
         className={`border-0 shadow-md ${
@@ -44,12 +46,12 @@ export function ExplanationCard({
                   isCorrect ? "text-green-700" : "text-orange-700"
                 }`}
               >
-                {isCorrect ? "Correct!" : "Not quite"}
+                {isCorrect ? "Nice hit" : "Close but"}
               </p>
               
               {!isCorrect && (
                 <p className="text-sm text-foreground mt-1">
-                  The correct answer was: <span className="font-medium">{correctAnswer}</span>
+                  The answer: <span className="font-medium">{correctAnswer}</span>
                 </p>
               )}
               

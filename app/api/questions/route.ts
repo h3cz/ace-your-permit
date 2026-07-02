@@ -7,7 +7,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { loadQuestions, searchQuestions } from '@/lib/data/question-loader';
-import { QuestionFilter } from '@/lib/data/questions/types';
+import { DifficultyLevel, QuestionFilter } from '@/lib/data/questions/types';
+import { hasValidAdminKey } from '@/lib/security';
 
 /**
  * GET /api/questions
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
     if (searchParams.has('difficulty')) {
       const difficulty = searchParams.get('difficulty')!;
       if (['easy', 'medium', 'hard'].includes(difficulty)) {
-        filter.difficulty = difficulty as any;
+        filter.difficulty = difficulty as DifficultyLevel;
       }
     }
     
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest) {
     
     // For now, only allow seeding via service role or environment check
     // In production, implement proper admin verification
-    const isAdmin = request.headers.get('x-admin-key') === process.env.ADMIN_API_KEY;
+    const isAdmin = hasValidAdminKey(request.headers.get('x-admin-key'), process.env.ADMIN_API_KEY);
     
     if (!isAdmin) {
       return NextResponse.json(

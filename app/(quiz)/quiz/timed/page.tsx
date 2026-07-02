@@ -31,6 +31,11 @@ const ILLINOIS_TEST_CONFIG = {
 export default function TimedQuizPage() {
   const router = useRouter();
   const mascot = useMascot({ autoHideDelay: 4000 });
+  const {
+    show: showMascot,
+    celebrate: celebrateMascot,
+    encourage: encourageMascot,
+  } = mascot;
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [authChecked, setAuthChecked] = useState(false);
 
@@ -59,19 +64,19 @@ export default function TimedQuizPage() {
     if (quiz.isAnswered) {
       if (quiz.isCorrect) {
         if (quiz.currentStreak >= 3) {
-          mascot.show(
+          showMascot(
             "excited",
             `That's ${quiz.currentStreak} in a row! Keep it up! 🔥`,
             "Streak!"
           );
         } else {
-          mascot.celebrate();
+          celebrateMascot();
         }
       } else {
-        mascot.encourage();
+        encourageMascot();
       }
     }
-  }, [quiz.isAnswered, quiz.isCorrect, quiz.currentStreak]);
+  }, [quiz.isAnswered, quiz.isCorrect, quiz.currentStreak, showMascot, celebrateMascot, encourageMascot]);
 
   // Handle quiz completion
   useEffect(() => {
@@ -80,16 +85,16 @@ export default function TimedQuizPage() {
       const passed = correctCount >= ILLINOIS_TEST_CONFIG.passingScore;
       
       if (passed) {
-        mascot.show(
+        showMascot(
           "excited",
-          `Congratulations! You passed with ${correctCount}/${ILLINOIS_TEST_CONFIG.questionCount}! 🎉`,
-          "Test Passed!"
+          `You passed with ${correctCount}/${ILLINOIS_TEST_CONFIG.questionCount}. Real-test energy unlocked 🎉`,
+          "Test Passed"
         );
       } else {
-        mascot.show(
+        showMascot(
           "encouraging",
-          `You got ${correctCount}/${ILLINOIS_TEST_CONFIG.questionCount}. Keep practicing for the real test! 💪`,
-          "Keep Trying!"
+          `You landed ${correctCount}/${ILLINOIS_TEST_CONFIG.questionCount}. Review the misses, then run it back 💪`,
+          "Keep Going"
         );
       }
 
@@ -105,19 +110,19 @@ export default function TimedQuizPage() {
 
       return () => clearTimeout(timeout);
     }
-  }, [quiz.isComplete, quiz.results]);
+  }, [quiz.isComplete, quiz.results, showMascot, router]);
 
   // Time warning
   useEffect(() => {
     if (quiz.timeRemaining && quiz.timeRemaining < 300 && quiz.timeRemaining > 290) {
       // Show warning when 5 minutes remaining
-      mascot.show(
+      showMascot(
         "thinking",
-        "Only 5 minutes left! Make sure to answer all questions!",
+        "Five minutes left. Keep moving and answer every question you can.",
         "Time Warning"
       );
     }
-  }, [quiz.timeRemaining]);
+  }, [quiz.timeRemaining, showMascot]);
 
   if (quiz.isLoading) {
     return (
@@ -182,9 +187,9 @@ export default function TimedQuizPage() {
           
           <div className="flex items-center gap-2">
             {isTimeLow && (
-              <div className="flex items-center gap-1 text-red-600 animate-pulse">
+              <div className="flex items-center gap-1 text-red-600 motion-safe:animate-pulse">
                 <AlertTriangle className="w-4 h-4" />
-                <span className="text-sm font-medium">Time Running Out!</span>
+                <span className="text-sm font-medium">Time is low</span>
               </div>
             )}
             <div className="flex items-center gap-2 bg-blue-100 px-3 py-1 rounded-full">
@@ -263,6 +268,7 @@ export default function TimedQuizPage() {
           onNext={quiz.nextQuestion}
           onSubmit={quiz.submitAnswer}
           onExit={() => router.push("/quiz")}
+          onComplete={quiz.completeQuiz}
           onFlag={() => quiz.flagQuestion(quiz.currentQuestionIndex)}
           isFlagged={quiz.flaggedQuestions.includes(quiz.currentQuestionIndex)}
           canGoBack={quiz.canGoBack}

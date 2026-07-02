@@ -8,6 +8,23 @@ import { illinoisDMVQuestions } from './questions/illinois-dmv-questions';
 import { ILLINOIS_CATEGORIES } from './questions/categories';
 import { Question, QuestionCategory } from './questions/types';
 
+type SeederError = {
+  message: string;
+};
+
+type SeederResult = PromiseLike<{
+  error: SeederError | null;
+}>;
+
+type SeederClient = {
+  from: (table: string) => {
+    delete: () => {
+      neq: (column: string, value: string) => SeederResult;
+    };
+    upsert: (values: unknown, options?: { onConflict?: string }) => SeederResult;
+  };
+};
+
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -60,7 +77,7 @@ export async function seedDatabase(config: Partial<SeedConfig> = {}): Promise<Se
   };
 
   // Create Supabase client
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  const supabase = createClient(supabaseUrl, supabaseServiceKey) as unknown as SeederClient;
 
   try {
     // Clear existing data if requested
@@ -97,7 +114,7 @@ export async function seedDatabase(config: Partial<SeedConfig> = {}): Promise<Se
 /**
  * Clear existing data from tables
  */
-async function clearExistingData(supabase: any): Promise<void> {
+async function clearExistingData(supabase: SeederClient): Promise<void> {
   // Delete in correct order due to foreign key constraints
   await supabase.from('user_question_progress').delete().neq('id', 'placeholder');
   await supabase.from('questions').delete().neq('id', 'placeholder');
@@ -108,7 +125,7 @@ async function clearExistingData(supabase: any): Promise<void> {
  * Seed question categories
  */
 async function seedCategories(
-  supabase: any,
+  supabase: SeederClient,
   dryRun: boolean
 ): Promise<{ count: number; errors: string[] }> {
   const errors: string[] = [];
@@ -145,7 +162,7 @@ async function seedCategories(
  * Seed questions in batches
  */
 async function seedQuestions(
-  supabase: any,
+  supabase: SeederClient,
   config: SeedConfig
 ): Promise<{ count: number; errors: string[] }> {
   const errors: string[] = [];

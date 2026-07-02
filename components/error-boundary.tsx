@@ -90,7 +90,7 @@ export function ErrorFallback({
         </div>
         <CardTitle className="text-lg">Error Loading Content</CardTitle>
         <CardDescription>
-          We couldn't load this content. Please try again.
+          We couldn&apos;t load this content. Please try again.
         </CardDescription>
       </CardHeader>
       <CardContent>

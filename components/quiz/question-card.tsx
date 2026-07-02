@@ -1,11 +1,11 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { QuestionWithAnswers } from "@/types/database";
-import { ImageIcon } from "lucide-react";
+import { Flag, ImageIcon } from "lucide-react";
 
 interface QuestionCardProps {
   question: QuestionWithAnswers;
@@ -23,6 +23,7 @@ export function QuestionCard({
   onToggleFlag,
 }: QuestionCardProps) {
   const [imgError, setImgError] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <Card className="border-0 shadow-lg overflow-hidden">
@@ -49,39 +50,24 @@ export function QuestionCard({
           </div>
           <button
             onClick={onToggleFlag}
-            className={`p-2 rounded-full transition-colors ${
+            className={`flex min-h-11 min-w-11 items-center justify-center rounded-full transition-colors ${
               isFlagged
                 ? "text-orange-500 bg-orange-100"
                 : "text-muted-foreground hover:text-muted-foreground hover:bg-muted"
             }`}
             aria-label={isFlagged ? "Unflag this question" : "Flag this question"}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill={isFlagged ? "currentColor" : "none"}
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-              <line x1="4" y1="22" x2="4" y2="15" />
-            </svg>
+            <Flag className={`h-5 w-5 ${isFlagged ? "fill-current" : ""}`} aria-hidden="true" />
           </button>
         </div>
         
         <AnimatePresence mode="wait">
           <motion.div
             key={question.id}
-            initial={{ opacity: 0, y: 10 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -10 }}
+            transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
           >
             <CardTitle className="text-lg leading-relaxed">
               {question.question_text}

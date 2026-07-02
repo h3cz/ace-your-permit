@@ -20,13 +20,13 @@ interface StepProfileProps {
   onComplete: (data?: Partial<OnboardingData>) => void;
 }
 
-export function StepProfile({ onComplete }: StepProfileProps) {
+export function StepProfile({ data, onComplete }: StepProfileProps) {
   const shouldReduceMotion = useReducedMotion();
   const [formData, setFormData] = useState({
-    displayName: "",
-    age: "",
-    state: DEFAULT_STATE,
-    licenseType: "permit",
+    displayName: typeof data.displayName === "string" ? data.displayName : "",
+    age: typeof data.age === "number" || typeof data.age === "string" ? String(data.age) : "",
+    state: typeof data.state === "string" ? data.state : DEFAULT_STATE,
+    licenseType: typeof data.licenseType === "string" ? data.licenseType : "permit",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -150,7 +150,7 @@ export function StepProfile({ onComplete }: StepProfileProps) {
             ))}
           </select>
           <p className={helperClass}>
-            Currently optimized for Illinois DMV tests. More states coming soon!
+            Currently optimized for Illinois DMV tests. More states coming soon.
           </p>
         </div>
 

@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { seedDatabase, validateQuestions, generateMigrationSQL, exportQuestionsAsJSON, SeedConfig } from '@/lib/data/content-seeder';
 import { validateQuestionBank, generateValidationReport } from '@/lib/data/question-validator';
+import { hasValidAdminKey } from '@/lib/security';
 
 /**
  * POST /api/questions/seed
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
   try {
     // Verify admin access
     const adminKey = request.headers.get('x-admin-key');
-    if (adminKey !== process.env.ADMIN_API_KEY) {
+    if (!hasValidAdminKey(adminKey, process.env.ADMIN_API_KEY)) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized - Admin access required' },
         { status: 401 }
@@ -76,7 +77,7 @@ export async function GET(request: NextRequest) {
   try {
     // Verify admin access (matches POST/PUT pattern)
     const adminKey = request.headers.get('x-admin-key');
-    if (adminKey !== process.env.ADMIN_API_KEY) {
+    if (!hasValidAdminKey(adminKey, process.env.ADMIN_API_KEY)) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized - Admin access required' },
         { status: 401 }
@@ -128,7 +129,7 @@ export async function PUT(request: NextRequest) {
   try {
     // Verify admin access
     const adminKey = request.headers.get('x-admin-key');
-    if (adminKey !== process.env.ADMIN_API_KEY) {
+    if (!hasValidAdminKey(adminKey, process.env.ADMIN_API_KEY)) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }

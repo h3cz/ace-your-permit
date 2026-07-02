@@ -28,7 +28,7 @@ const inter = { variable: `${dmSans.variable} ${jetbrainsMono.variable}` };
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://aceyourpermit.com";
 const title = "Ace Your Permit - Illinois Driving Test Prep";
 const description =
-  "Free Illinois permit practice tests. 3,400+ questions across all official SOS topics. Gamified for teens.";
+  "Free Illinois permit practice tests with gamified study, streaks, and bite-sized questions for first-timers, retakers, and new Illinois drivers.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -84,10 +84,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
       { url: "/icons/icon.svg", sizes: "any", type: "image/svg+xml" },
     ],
     apple: [
-      { url: "/icons/apple-touch-icon.svg", sizes: "any", type: "image/svg+xml" },
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
 };
@@ -119,9 +121,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Ace Your Permit" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="msapplication-config" content="/browserconfig.xml" />
         <meta name="msapplication-TileColor" content="#2563EB" />
         <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="color-scheme" content="light dark" />
       </head>
       <body
         className={`${inter.variable} font-sans antialiased min-h-screen bg-background text-foreground`}

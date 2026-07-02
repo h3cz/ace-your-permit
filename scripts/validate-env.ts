@@ -3,6 +3,10 @@
 // Run before build to ensure all required env vars are set
 // ============================================
 
+import { loadEnvConfig } from "@next/env";
+
+loadEnvConfig(process.cwd(), process.env.NODE_ENV !== "production");
+
 interface EnvVar {
   name: string;
   required: boolean | "production";
@@ -103,17 +107,22 @@ const envVars: EnvVar[] = [
   },
   {
     name: "UPSTASH_REDIS_REST_URL",
-    required: false,
+    required: "production",
     description:
-      "Upstash Redis REST URL for rate limiting. Optional; missing = rate limit is a no-op.",
+      "Upstash Redis REST URL for production rate limiting.",
   },
   {
     name: "UPSTASH_REDIS_REST_TOKEN",
-    required: false,
+    required: "production",
     description:
-      "Upstash Redis REST token for rate limiting. Optional; missing = rate limit is a no-op.",
+      "Upstash Redis REST token for production rate limiting.",
   },
 ];
+
+function looksLikeWeakSecret(name: string, value: string): boolean {
+  if (name !== "ADMIN_API_KEY" && name !== "CRON_SECRET") return false;
+  return value.length < 32 || /^(changeme|secret|password|admin|test|dev|local)$/i.test(value);
+}
 
 function validateEnv(): { valid: boolean; errors: string[]; warnings: string[] } {
   const errors: string[] = [];
@@ -139,6 +148,13 @@ function validateEnv(): { valid: boolean; errors: string[]; warnings: string[] }
           errors.push(`❌ ${envVar.name} contains placeholder value: ${value}`);
         } else {
           warnings.push(`⚠️  ${envVar.name} contains placeholder value: ${value}`);
+        }
+      } else if (looksLikeWeakSecret(envVar.name, value)) {
+        const message = `${envVar.name} should be at least 32 random characters`;
+        if (isProd) {
+          errors.push(`❌ ${message}`);
+        } else {
+          warnings.push(`⚠️  ${message}`);
         }
       } else {
         console.log(`✅ ${envVar.name} is set`);

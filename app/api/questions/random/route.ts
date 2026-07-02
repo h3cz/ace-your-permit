@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getRandomQuestions, getPracticeTestQuestions, getAdaptiveQuestions } from '@/lib/data/questions';
+import { getLegacyQuestionId, getStableQuestionId } from '@/lib/data/questions/question-id';
 import { DifficultyLevel } from '@/lib/data/questions/types';
 
 /**
@@ -38,20 +39,18 @@ export async function GET(request: NextRequest) {
     const exclude = searchParams.get('exclude')?.split(',').filter(Boolean) || [];
     const idsParam = searchParams.get('ids')?.split(',').filter(Boolean) || [];
 
-    // Hash helper — must stay in lockstep with hooks/use-quiz.ts so the
-    // transformed numeric IDs resolve back to the underlying string slugs.
-    const hashSlug = (slug: string): number =>
-      parseInt(slug.replace(/\D/g, '').slice(0, 8)) || 0;
-
     let questions;
 
     switch (mode) {
       case 'by_ids': {
-        // Look up questions by the numeric hashed IDs stored in
-        // user_wrong_answers.question_id (H9 — mistakes mode).
+        // Look up questions by the stable numeric IDs stored in
+        // user_wrong_answers.question_id. Also accept the old digit-parsed IDs
+        // so existing rows still resolve after the stable-id fix.
         const targets = new Set(idsParam.map((s) => parseInt(s, 10)).filter((n) => !Number.isNaN(n)));
         const pool = getRandomQuestions(10000);
-        questions = pool.filter((q) => targets.has(hashSlug(q.id))).slice(0, count);
+        questions = pool
+          .filter((q) => targets.has(getStableQuestionId(q.id)) || targets.has(getLegacyQuestionId(q.id)))
+          .slice(0, count);
         break;
       }
 
