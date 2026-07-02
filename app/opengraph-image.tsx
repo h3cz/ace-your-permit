@@ -73,26 +73,20 @@ export default async function Image(): Promise<ImageResponse> {
               </linearGradient>
             </defs>
             <rect width="120" height="120" rx="24" fill="url(#bgM)" />
-            {/* Arc: centre 60,76  radius 38, 195°→345° */}
-            <path
-              d="M 23 66 A 38 38 0 1 1 97 66"
-              fill="none"
-              stroke="rgba(255,255,255,0.85)"
-              strokeWidth="8"
-              strokeLinecap="round"
-            />
+            {/* Wheel rim: centre 60,79  radius 39 */}
+            <circle cx="60" cy="79" r="39" fill="none" stroke="#0F172A" strokeWidth="4" />
+            <path d="M 41 100 Q 41 88 51 88 Q 41 88 41 100 Z" fill="none" stroke="#0F172A" strokeWidth="2.6" strokeLinejoin="round" />
+            <path d="M 79 100 Q 79 88 69 88 Q 79 88 79 100 Z" fill="none" stroke="#0F172A" strokeWidth="2.6" strokeLinejoin="round" />
+            {/* Dial face */}
+            <circle cx="60" cy="79" r="32" fill="#F8FAFC" />
             {/* Top tick */}
-            <line x1="60" y1="44" x2="60" y2="38" stroke="white" strokeWidth="3" strokeLinecap="round" />
-            {/* Orange needle at 330° */}
-            <line x1="50" y1="82" x2="92" y2="58" stroke="#F97316" strokeWidth="5" strokeLinecap="round" />
-            <circle cx="60" cy="76" r="8" fill="#F97316" />
-            <circle cx="60" cy="76" r="4" fill="#EA580C" />
-            {/* D letterform */}
-            <rect x="42" y="88" width="7" height="18" rx="2.5" fill="white" />
-            <path d="M 47 88 h7 a 9 9 0 0 1 0 18 h-7 Z" fill="white" />
-            <path d="M 47.5 91 h4.5 a 6 6 0 0 1 0 12 h-4.5 Z" fill="#1D4ED8" />
-            {/* Orange bar */}
-            <rect x="42" y="110" width="32" height="4" rx="2" fill="#F97316" />
+            <line x1="60" y1="49" x2="60" y2="43" stroke="#0F172A" strokeWidth="3" strokeLinecap="round" />
+            {/* Orange needle sweeping up-right, arrow tip */}
+            <line x1="45" y1="93" x2="80" y2="57" stroke="#F97316" strokeWidth="5.5" strokeLinecap="round" />
+            <path d="M 80 57 L 92 45 L 84 63 Z" fill="#F97316" />
+            {/* Pivot hub */}
+            <circle cx="60" cy="79" r="5.5" fill="#F97316" />
+            <circle cx="60" cy="79" r="2.8" fill="#EA580C" />
           </svg>
 
           {/* Wordmark */}

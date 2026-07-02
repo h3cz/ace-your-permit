@@ -1,85 +1,48 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Ace Your Permit">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="0%" stop-color="#3B82F6"/>
       <stop offset="100%" stop-color="#1D4ED8"/>
-    </linearGradient>
-    <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.90"/>
     </linearGradient>
   </defs>
 
-  <!-- Background: rounded square, blue -->
+  <!-- Background: rounded square, blue, fills full frame -->
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
 
-  <!-- ── SPEEDOMETER ARC ── -->
-  <!-- Arc spans 210° from ~195° to ~345° (bottom-left to bottom-right, open at top-left)
-       Centre: 256,288  Radius: 168
-       Arc endpoints in Cartesian (SVG):
-         Start (195°): cx + r·cos(195°) = 256 + 168·(−0.9659) = 93.7  ≈ 94
-                       cy + r·sin(195°) = 288 + 168·(−0.2588) = 244.5 ≈ 245
-         End   (345°): cx + r·cos(345°) = 256 + 168·( 0.9659) = 418.3 ≈ 418
-                       cy + r·sin(345°) = 288 + 168·(−0.2588) = 244.5 ≈ 245
-       large-arc-flag=1 because 210° > 180°
-  -->
-  <path
-    d="M 94 245 A 168 168 0 1 1 418 245"
-    fill="none"
-    stroke="url(#arcGrad)"
-    stroke-width="36"
-    stroke-linecap="round"
-  />
+  <!-- Steering wheel rim -->
+  <circle cx="256" cy="270" r="172" fill="none" stroke="#0F172A" stroke-width="14"/>
+  <circle cx="256" cy="270" r="172" fill="none" stroke="#3B82F6" stroke-width="6" opacity="0.5"/>
 
-  <!-- Tick marks on the arc at 210°, 225°, 240°, 270°, 300°, 315°, 330°, 345°
-       Short minor ticks (length 14), slightly longer at quarters (20).
-       Computed: tick outer = cx+R·cos(θ), inner = cx+(R−tick)·cos(θ) where R=186 (outer edge of stroke mid = 168+18=186) -->
-  <!-- We draw ticks as short strokes at angle θ, from r=152 to r=174 (spanning the arc stroke) -->
-  <!-- Minor ticks every 15°: 210,225,240,255,270,285,300,315,330,345 -->
-  <!-- Tick: start=(cx+152·cos, cy+152·sin), end=(cx+174·cos, cy+174·sin) -->
-  <!-- 210° cos=-0.866 sin=-0.5   → 124,212 → 145,201 -->
-  <line x1="124" y1="212" x2="143" y2="198" stroke="white" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
-  <!-- 225° cos=-0.707 sin=-0.707 → 137,180 → 256+174·(-0.707)=132, 288+174·(-0.707)=165 -->
-  <line x1="137" y1="180" x2="133" y2="165" stroke="white" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
-  <!-- 240° cos=-0.5 sin=-0.866   → 180,155 → 169,138 -->
-  <line x1="180" y1="156" x2="169" y2="138" stroke="white" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
-  <!-- 255° cos=-0.259 sin=-0.966 → 217,141 → 211,121 -->
-  <line x1="216" y1="141" x2="211" y2="120" stroke="white" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
-  <!-- 270° cos=0 sin=-1           → 256,136 → 256,114 -->
-  <line x1="256" y1="136" x2="256" y2="114" stroke="white" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
-  <!-- 285° cos=0.259 sin=-0.966  → 295,141 → 301,121 -->
-  <line x1="296" y1="141" x2="301" y2="120" stroke="white" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
-  <!-- 300° cos=0.5 sin=-0.866    → 332,156 → 343,138 -->
-  <line x1="332" y1="156" x2="343" y2="138" stroke="white" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
-  <!-- 315° cos=0.707 sin=-0.707  → 375,180 → 379,165 -->
-  <line x1="375" y1="180" x2="379" y2="165" stroke="white" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
-  <!-- 330° cos=0.866 sin=-0.5    → 388,212 → 397,198  -->
-  <line x1="388" y1="212" x2="369" y2="198" stroke="white" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
+  <!-- Wheel spokes (bottom, steering-wheel silhouette) -->
+  <path d="M 176 366 Q 176 320 220 320 Q 176 320 176 366 Z" fill="none" stroke="#0F172A" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M 336 366 Q 336 320 292 320 Q 336 320 336 366 Z" fill="none" stroke="#0F172A" stroke-width="10" stroke-linejoin="round"/>
 
-  <!-- ── ORANGE NEEDLE ── pointing at ~330° ("redline" — max speed, ready to go) -->
-  <!-- Needle tip: cx+160·cos(330°)=256+160·0.866=394, cy+160·sin(330°)=288+160·(−0.5)=208 -->
-  <!-- Needle base: a small ellipse at pivot cx=256,cy=288, tail goes opposite ~150° -->
-  <!-- Tail: cx+48·cos(150°)=256+48·(−0.866)=214, cy+48·sin(150°)=288+48·0.5=312 -->
-  <line
-    x1="218" y1="310"
-    x2="385" y2="214"
-    stroke="#F97316"
-    stroke-width="14"
-    stroke-linecap="round"
-  />
-  <!-- Pivot hub: orange centre dot -->
-  <circle cx="256" cy="288" r="22" fill="#F97316"/>
-  <circle cx="256" cy="288" r="11" fill="#EA580C"/>
+  <!-- Dial face -->
+  <circle cx="256" cy="270" r="140" fill="#F8FAFC"/>
 
-  <!-- Speed label zone: "D" letterform centred below pivot, bold geometric D -->
-  <!-- "D" as two paths: outer rect-with-bump minus inner crescent, all white -->
-  <!-- Using a custom geometric D: left vertical bar + right semicircle bump -->
-  <rect x="188" y="332" width="28" height="92" rx="8" fill="white"/>
-  <path d="M 210 332 h28 a 46 46 0 0 1 0 92 h-28 Z" fill="white"/>
-  <!-- inner knockout -->
-  <path d="M 214 352 h18 a 26 26 0 0 1 0 52 h-18 Z" fill="url(#bg)"/>
+  <!-- Tick marks -->
+  <g stroke="#0F172A" stroke-width="7" stroke-linecap="round">
+    <line x1="256" y1="140" x2="256" y2="118"/>
+    <line x1="196" y1="156" x2="184" y2="138"/>
+    <line x1="150" y1="200" x2="130" y2="188"/>
+    <line x1="316" y1="156" x2="328" y2="138"/>
+    <line x1="362" y1="200" x2="382" y2="188"/>
+  </g>
 
-  <!-- Subtle bottom label: "MASTER" in small caps style using paths is too complex;
-       use a thin white line accent instead to ground the D -->
-  <rect x="188" y="436" width="136" height="6" rx="3" fill="#F97316" opacity="0.85"/>
+  <!-- Speed arc accent -->
+  <path d="M 176 320 A 108 108 0 0 1 256 186" fill="none" stroke="#F97316" stroke-width="10" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Needle: sweeping up-right, arrow tip -->
+  <line x1="212" y1="316" x2="330" y2="196" stroke="#F97316" stroke-width="20" stroke-linecap="round"/>
+  <path d="M 330 196 L 366 172 L 344 214 Z" fill="#F97316"/>
+
+  <!-- Motion spark -->
+  <g fill="#F97316">
+    <path d="M 378 150 l 8 22 l -22 -8 Z"/>
+    <circle cx="392" cy="188" r="5"/>
+  </g>
+
+  <!-- Pivot hub -->
+  <circle cx="256" cy="270" r="20" fill="#F97316"/>
+  <circle cx="256" cy="270" r="10" fill="#EA580C"/>
 </svg>
