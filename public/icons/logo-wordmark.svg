@@ -1,6 +1,6 @@
 <!-- Wordmark: "Ace Your Permit". Steering-wheel speedometer logomark + 2-tone wordmark.
      "Ace Your" in brand blue, "Permit" in slate-900, orange accent under. -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 80" role="img" aria-label="Ace Your Permit">
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="80" viewBox="0 0 520 80" role="img" aria-label="Ace Your Permit">
   <defs>
     <linearGradient id="bgMark" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#3B82F6"/>
