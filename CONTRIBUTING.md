@@ -58,8 +58,8 @@ export const questions = [
 ### Setup
 
 ```bash
-git clone https://github.com/TooFaded420/drivemaster-app.git
-cd drivemaster-app
+git clone https://github.com/h3cz/ace-your-permit.git
+cd ace-your-permit
 npm install
 cp .env.example .env.local
 # Fill in your Supabase credentials

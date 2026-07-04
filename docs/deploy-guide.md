@@ -96,7 +96,7 @@ Run the question seeding script or manually insert from `lib/data/questions/illi
 ## Step 2: Vercel Deployment
 
 1. Go to [vercel.com/new](https://vercel.com/new)
-2. Import the `drivemaster-app` GitHub repo
+2. Import the `ace-your-permit` GitHub repo
 3. Set environment variables (Settings > Environment Variables):
 
 ```

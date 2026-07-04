@@ -50,8 +50,8 @@ Most driving test apps are boring quiz sites covered in ads. Ace Your Permit is 
 ## Quick Start
 
 ```bash
-git clone https://github.com/h3cz/drivemaster-app.git
-cd drivemaster-app
+git clone https://github.com/h3cz/ace-your-permit.git
+cd ace-your-permit
 npm install
 cp .env.example .env.local
 # Fill in Supabase credentials (see docs/deploy-guide.md)
@@ -77,7 +77,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Project Structure
 
 ```
-drivemaster-app/
+ace-your-permit/
   app/
     (auth)/              Login, signup
     (dashboard)/         Main dashboard + countdown widget
