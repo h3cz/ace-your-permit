@@ -1,19 +1,41 @@
-# Ace Your Permit
+<p align="center">
+  <img src="public/images/readme-banner.png" alt="Ace Your Permit" width="100%" />
+</p>
 
-**Pass your driving test. Have fun doing it.**
+<h1 align="center">Ace Your Permit</h1>
 
-A gamified, open-source driving test prep app. Duolingo-style XP, streaks, leaderboards, and a hype-beast mascot named Dash who explains why you got that question wrong.
+<p align="center"><strong>Pass your driving test. Have fun doing it.</strong></p>
 
-Illinois first. Every state and country next.
+<p align="center">
+  A gamified, open-source driving test prep app. Duolingo-style XP, streaks, leaderboards,
+  and a hype-beast mascot named Dash who explains why you got that question wrong.
+</p>
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
-![Supabase](https://img.shields.io/badge/Supabase-green)
-![License](https://img.shields.io/badge/License-MIT-yellow)
+<p align="center">Illinois first. Every state and country next.</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16-black" alt="Next.js 16" />
+  <img src="https://img.shields.io/badge/TypeScript-5-blue" alt="TypeScript 5" />
+  <img src="https://img.shields.io/badge/Supabase-green" alt="Supabase" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow" alt="MIT License" />
+</p>
+
+---
+
+## Table of Contents
+
+- [What Makes This Different](#what-makes-this-different)
+- [Quick Start](#quick-start)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [Feature Flags](#feature-flags)
+- [Design System](#design-system)
+- [License](#license)
 
 ## What Makes This Different
 
-Most driving test apps are boring quiz sites covered in ads. DriveMaster is built for the procrastinating teenager who keeps putting off studying:
+Most driving test apps are boring quiz sites covered in ads. Ace Your Permit is built for anyone procrastinating on their Illinois permit test — teens, adults, new residents, retakers, all of it:
 
 - **Gamification that works** — XP, 20 levels, daily streaks, achievements, weekly leagues (Bronze to Diamond)
 - **Dash the mascot** — a hype-beast car who explains your mistakes in Gen Z language
@@ -28,7 +50,7 @@ Most driving test apps are boring quiz sites covered in ads. DriveMaster is buil
 ## Quick Start
 
 ```bash
-git clone https://github.com/TooFaded420/drivemaster-app.git
+git clone https://github.com/h3cz/drivemaster-app.git
 cd drivemaster-app
 npm install
 cp .env.example .env.local
@@ -41,7 +63,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Tech Stack
 
 | Layer | Tech |
-|-------|------|
+|---|---|
 | Framework | Next.js 16 (App Router) + TypeScript |
 | Styling | Tailwind CSS 4 + shadcn/ui + Framer Motion |
 | Backend | Supabase (Auth, PostgreSQL, Realtime) |
@@ -77,7 +99,7 @@ drivemaster-app/
     feature-flags.ts     Feature toggles for safe rollout
     i18n.ts              Internationalization config
   messages/              EN + ES translation files
-  __tests__/             28 unit tests (XP calculator)
+  __tests__/             Unit tests (XP calculator, question schema)
   DESIGN.md              Full design system (colors, fonts, spacing, motion, Dash personality)
   CLAUDE.md              AI assistant conventions
 ```
@@ -89,7 +111,7 @@ drivemaster-app/
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide and [docs/question-bank-spec.md](./docs/question-bank-spec.md) for the question format.
 
 ### Currently Available
-- Illinois (200+ questions)
+- Illinois (697 questions across 9 categories)
 
 ### Wanted
 - California, Texas, Florida, New York, Ohio (highest population)
@@ -122,4 +144,4 @@ See [DESIGN.md](./DESIGN.md) for the complete design system:
 
 ---
 
-Built to help drivers everywhere pass their test.
+<p align="center">Built to help drivers everywhere pass their test.</p>
