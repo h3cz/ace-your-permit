@@ -42,3 +42,7 @@ next-env.d.ts
 .gstack/
 supabase/.temp/
 .torch/
+
+# local AI assistant tool state (Claude Code, oh-my-claudecode)
+.claude/
+.omc/
